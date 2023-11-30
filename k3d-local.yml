@@ -1,0 +1,40 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: local
+servers: 1
+agents: 0
+image: docker.io/rancher/k3s:v1.27.7-k3s2
+network: k3d-local
+ports:
+- port: 443:443
+  nodeFilters:
+  - loadbalancer
+- port: 80:80
+  nodeFilters:
+  - loadbalancer
+- port: 30000-30100:30000-30100
+  nodeFilters:
+  - server:0
+options:
+  k3s:
+    extraArgs: # additional arguments passed to the `k3s server|agent` command; same as `--k3s-arg`
+    - arg: --kubelet-arg=feature-gates=KubeletInUserNamespace=true
+      nodeFilters:
+      - 'server:*'
+    - arg: --system-default-registry=docker.mirror.registry.localhost:5000
+      nodeFilters:
+      - 'server:*'
+  kubeconfig:
+    updateDefaultKubeconfig: false
+    switchCurrentContext: false
+  runtime:
+    ulimits:
+    - name: nofile
+      soft: 65535
+      hard: 65535
+registries:
+  use:
+  - local.registry.localhost:5000
+  - docker.mirror.registry.localhost:5000
+  - quay.mirror.registry.localhost:5000

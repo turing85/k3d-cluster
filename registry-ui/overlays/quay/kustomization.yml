@@ -1,0 +1,54 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../resources
+
+commonLabels:
+  app.kubernetes.io/instance: quay.registry-ui
+commonAnnotations:
+  app.kubernetes.io/registry-interna-url: http://quay.mirror.registry.localhost:5000
+  app.kubernetes.io/ingress-hostname: quay.registry.k3d.localhost
+  app.kubernetes.io/site-title: Quay Registry Mirror
+namePrefix: quay
+
+replacements:
+- source:
+    kind: Deployment
+    name: -registry-ui
+    fieldPath: metadata.annotations.app\.kubernetes\.io/registry-interna-url
+  targets:
+  - select:
+      kind: Deployment
+      name: -registry-ui
+    fieldPaths:
+    - spec.template.spec.containers.[name=registry-ui].env.[name=NGINX_PROXY_PASS_URL].value
+    options:
+      create: true
+
+- source:
+    kind: Ingress
+    name: -registry-ui
+    fieldPath: metadata.annotations.app\.kubernetes\.io/ingress-hostname
+  targets:
+  - select:
+      kind: Ingress
+      name: -registry-ui
+    fieldPaths:
+    - spec.rules.[host=PLACEHOLDER].host
+    - spec.tls.0.hosts.0
+    options:
+      create: true
+
+- source:
+    kind: Deployment
+    name: -registry-ui
+    fieldPath: metadata.annotations.app\.kubernetes\.io/site-title
+  targets:
+  - select:
+      kind: Deployment
+      name: -registry-ui
+    fieldPaths:
+    - spec.template.spec.containers.[name=registry-ui].env.[name=REGISTRY_TITLE].value
+    options:
+      create: true

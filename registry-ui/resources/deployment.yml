@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: -registry-ui
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: registry-ui
+        image: docker.io/joxit/docker-registry-ui:2.5.6-debian
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SINGLE_REGISTRY
+          value: 'true'
+        - name: REGISTRY_SECURED
+          value: 'false'
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 20m
+            memory: 10Mi
+          limits:
+            cpu: 100m
+            memory: 50Mi
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5

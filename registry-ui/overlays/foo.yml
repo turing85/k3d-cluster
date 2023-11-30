@@ -1,0 +1,476 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://docker.mirror.registry.localhost:5000
+    app.kubernetes.io/site-title: Docker Registry Mirror
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: docker.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: docker-registry-ui
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: docker.registry-ui
+    app.kubernetes.io/name: registry-ui
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://local.registry.localhost:5000
+    app.kubernetes.io/site-title: Local Registry
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: local.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: local-registry-ui
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: local.registry-ui
+    app.kubernetes.io/name: registry-ui
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: quay.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://quay.mirror.registry.localhost:5000
+    app.kubernetes.io/site-title: Quay Registry Mirror
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: quay.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: quay-registry-ui
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: quay.registry-ui
+    app.kubernetes.io/name: registry-ui
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://docker.mirror.registry.localhost:5000
+    app.kubernetes.io/site-title: Docker Registry Mirror
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: docker.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: docker-registry-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: registry-ui
+      app.kubernetes.io/instance: docker.registry-ui
+      app.kubernetes.io/name: registry-ui
+  template:
+    metadata:
+      annotations:
+        app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+        app.kubernetes.io/registry-interna-url: http://docker.mirror.registry.localhost:5000
+        app.kubernetes.io/site-title: Docker Registry Mirror
+      labels:
+        app.kubernetes.io/component: registry-ui
+        app.kubernetes.io/instance: docker.registry-ui
+        app.kubernetes.io/name: registry-ui
+    spec:
+      containers:
+      - env:
+        - name: SINGLE_REGISTRY
+          value: "true"
+        - name: REGISTRY_SECURED
+          value: "false"
+        - name: NGINX_PROXY_PASS_URL
+          value: http://docker.mirror.registry.localhost:5000
+        - name: REGISTRY_TITLE
+          value: Docker Registry Mirror
+        image: docker.io/joxit/docker-registry-ui:2.5.6-debian
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+        name: registry-ui
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 20m
+            memory: 10Mi
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://local.registry.localhost:5000
+    app.kubernetes.io/site-title: Local Registry
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: local.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: local-registry-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: registry-ui
+      app.kubernetes.io/instance: local.registry-ui
+      app.kubernetes.io/name: registry-ui
+  template:
+    metadata:
+      annotations:
+        app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+        app.kubernetes.io/registry-interna-url: http://local.registry.localhost:5000
+        app.kubernetes.io/site-title: Local Registry
+      labels:
+        app.kubernetes.io/component: registry-ui
+        app.kubernetes.io/instance: local.registry-ui
+        app.kubernetes.io/name: registry-ui
+    spec:
+      containers:
+      - env:
+        - name: SINGLE_REGISTRY
+          value: "true"
+        - name: REGISTRY_SECURED
+          value: "false"
+        - name: NGINX_PROXY_PASS_URL
+          value: http://local.registry.localhost:5000
+        - name: REGISTRY_TITLE
+          value: Local Registry
+        image: docker.io/joxit/docker-registry-ui:2.5.6-debian
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+        name: registry-ui
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 20m
+            memory: 10Mi
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: quay.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://quay.mirror.registry.localhost:5000
+    app.kubernetes.io/site-title: Quay Registry Mirror
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: quay.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: quay-registry-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: registry-ui
+      app.kubernetes.io/instance: quay.registry-ui
+      app.kubernetes.io/name: registry-ui
+  template:
+    metadata:
+      annotations:
+        app.kubernetes.io/ingress-hostname: quay.registry.k3d.localhost
+        app.kubernetes.io/registry-interna-url: http://quay.mirror.registry.localhost:5000
+        app.kubernetes.io/site-title: Quay Registry Mirror
+      labels:
+        app.kubernetes.io/component: registry-ui
+        app.kubernetes.io/instance: quay.registry-ui
+        app.kubernetes.io/name: registry-ui
+    spec:
+      containers:
+      - env:
+        - name: SINGLE_REGISTRY
+          value: "true"
+        - name: REGISTRY_SECURED
+          value: "false"
+        - name: NGINX_PROXY_PASS_URL
+          value: http://quay.mirror.registry.localhost:5000
+        - name: REGISTRY_TITLE
+          value: Quay Registry Mirror
+        image: docker.io/joxit/docker-registry-ui:2.5.6-debian
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+        name: registry-ui
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            cpu: 100m
+            memory: 50Mi
+          requests:
+            cpu: 20m
+            memory: 10Mi
+        startupProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://docker.mirror.registry.localhost:5000
+    app.kubernetes.io/site-title: Docker Registry Mirror
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: docker.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: docker-registry-ui
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: docker.registry.k3d.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: docker-registry-ui
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - docker.registry.k3d.localhost
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://docker.mirror.registry.localhost:5000
+    app.kubernetes.io/site-title: Docker Registry Mirror
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-http-to-https-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls: "false"
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: docker.registry-ui
+    app.kubernetes.io/name: registry-ui
+    foo: bar
+  name: docker-registry-ui-http-to-https-redirect
+spec:
+  rules:
+  - host: docker.registry.k3d.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: docker-registry-ui
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://local.registry.localhost:5000
+    app.kubernetes.io/site-title: Local Registry
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: local.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: local-registry-ui
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: docker.registry.k3d.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: local-registry-ui
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - docker.registry.k3d.localhost
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://local.registry.localhost:5000
+    app.kubernetes.io/site-title: Local Registry
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-http-to-https-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls: "false"
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: local.registry-ui
+    app.kubernetes.io/name: registry-ui
+    foo: bar
+  name: local-registry-ui-http-to-https-redirect
+spec:
+  rules:
+  - host: docker.registry.k3d.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: local-registry-ui
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: quay.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://quay.mirror.registry.localhost:5000
+    app.kubernetes.io/site-title: Quay Registry Mirror
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: quay.registry-ui
+    app.kubernetes.io/name: registry-ui
+  name: quay-registry-ui
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: quay.registry.k3d.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: quay-registry-ui
+            port:
+              name: http
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - quay.registry.k3d.localhost
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    app.kubernetes.io/ingress-hostname: quay.registry.k3d.localhost
+    app.kubernetes.io/registry-interna-url: http://quay.mirror.registry.localhost:5000
+    app.kubernetes.io/site-title: Quay Registry Mirror
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-http-to-https-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.tls: "false"
+  labels:
+    app.kubernetes.io/component: registry-ui
+    app.kubernetes.io/instance: quay.registry-ui
+    app.kubernetes.io/name: registry-ui
+    foo: bar
+  name: quay-registry-ui-http-to-https-redirect
+spec:
+  rules:
+  - host: quay.registry.k3d.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: quay-registry-ui
+            port:
+              name: http
+        path: /
+        pathType: Prefix
