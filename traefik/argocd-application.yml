@@ -20,4 +20,6 @@ spec:
     repoURL: https://github.com/turing85/k3d-cluster.git
     targetRevision: main
   syncPolicy:
-    automated: {}
+    automated:
+      prune: true
+      selfHeal: true
