@@ -13,7 +13,7 @@ spec:
     helm:
       releaseName: kubernetes-dashboard
       valueFiles:
-      - $values/argocd/helm-values.yml
+      - $values/kubernetes-dashboard/helm-values.yml
     repoURL: https://kubernetes.github.io/dashboard
     targetRevision: 6.0.8
   - ref: values
