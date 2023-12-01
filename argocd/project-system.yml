@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: system
+  namespace: argocd
+spec:
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  description: All System Applications
+  destinations:
+  - name: in-cluster
+    namespace: kube-system
+    server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: traefik
+    server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: kubernetes-dashboard
+    server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: gogs
+    server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: registry-ui
+    server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: harbor
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - https://github.com/turing85/k3d-cluster.git
+  - https://argoproj.github.io/argo-helm
+  - https://helm.goharbor.io
+  - https://kubernetes.github.io/dashboard
+  - https://prometheus-community.github.io/helm-charts
+  - https://traefik.github.io/charts
+status: {}

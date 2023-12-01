@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  project: system
+  sources:
+  - chart: argo-cd
+    helm:
+      releaseName: argocd
+      valueFiles:
+      - $values/argocd/helm-values.yml
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: 5.51.5
+  - ref: values
+    repoURL: https://github.com/turing85/k3d-cluster.git
+    targetRevision: main
+  syncPolicy:
+    automated: {}

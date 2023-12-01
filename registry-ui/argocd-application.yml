@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: registry-ui
+  namespace: argocd
+spec:
+  destination:
+    namespace: registry-ui
+    server: https://kubernetes.default.svc
+  project: system
+  source:
+    path: registry-ui/overlays
+    repoURL: https://github.com/turing85/k3d-cluster.git
+    targetRevision: main
+  syncPolicy:
+    automated: {}
