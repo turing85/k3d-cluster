@@ -33,6 +33,9 @@ spec:
   - name: in-cluster
     namespace: harbor
     server: https://kubernetes.default.svc
+  - name: in-cluster
+    namespace: portainer
+    server: https://kubernetes.default.svc
   sourceRepos:
   - https://github.com/turing85/k3d-cluster.git
   - https://argoproj.github.io/argo-helm

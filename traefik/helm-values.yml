@@ -543,8 +543,7 @@ globalArguments:
 ## Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
 additionalArguments:
 - --api.insecure=true
-- --entrypoints.https.address=:443/tcp
-- --entrypoints.web.http.redirections.entrypoint.to=https
+- --entrypoints.web.http.redirections.entrypoint.to=websecure
 - --entrypoints.web.http.redirections.entrypoint.scheme=https
 - --entrypoints.web.http.redirections.entrypoint.permanent=true
 #  - "--providers.kubernetesingress.ingressclass=traefik-internal"
@@ -606,7 +605,7 @@ ports:
   web:
     ## -- Enable this entrypoint as a default entrypoint. When a service doesn't explicitly set an entrypoint it will only use this entrypoint.
     # asDefault: true
-    port: 8000
+    port: 80
     # hostPort: 8000
     # containerPort: 8000
     expose: true
@@ -638,7 +637,7 @@ ports:
   websecure:
     ## -- Enable this entrypoint as a default entrypoint. When a service doesn't explicitly set an entrypoint it will only use this entrypoint.
     # asDefault: true
-    port: 8443
+    port: 443
     # hostPort: 8443
     # containerPort: 8443
     expose: true
