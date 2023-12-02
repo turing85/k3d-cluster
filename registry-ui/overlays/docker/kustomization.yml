@@ -7,9 +7,10 @@ resources:
 commonLabels:
   app.kubernetes.io/instance: docker.registry-ui
 commonAnnotations:
-  app.kubernetes.io/registry-interna-url: http://docker.mirror.registry.localhost:5000
   app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
+  app.kubernetes.io/registry-interna-url: http://docker.mirror.registry.localhost:5000
   app.kubernetes.io/site-title: Docker Registry Mirror
+  app.kubernetes.io/tls-secretName: docker-registry-ui-crt
 namePrefix: docker
 
 replacements:
@@ -39,6 +40,18 @@ replacements:
     - spec.tls.0.hosts.0
     options:
       create: true
+- source:
+    kind: Ingress
+    name: -registry-ui
+    fieldPath: metadata.annotations.app\.kubernetes\.io/tls-secretName
+  targets:
+  - select:
+      kind: Ingress
+      name: -registry-ui
+    fieldPaths:
+    - spec.tls.0.secretName
+    options:
+      create: true
 
 - source:
     kind: Deployment
@@ -52,3 +65,4 @@ replacements:
     - spec.template.spec.containers.[name=registry-ui].env.[name=REGISTRY_TITLE].value
     options:
       create: true
+

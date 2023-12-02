@@ -176,6 +176,7 @@ ingress:
 
   ## Kubernetes Dashboard Ingress annotations
   annotations:
+    cert-manager.io/cluster-issuer: "cluster-issuer-ca"
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: 'true'
 
@@ -210,6 +211,7 @@ ingress:
   tls:
   - hosts:
     - dashboard.k3d.locahost
+    secretName: dashboard-crt
 
 # Global dashboard settings
 settings: {}

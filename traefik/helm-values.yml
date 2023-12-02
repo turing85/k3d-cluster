@@ -947,7 +947,7 @@ extraObjects:
   metadata:
     name: traefik-dashboard
     annotations:
-      argocd.argoproj.io/hook: Skip
+      cert-manager.io/cluster-issuer: "cluster-issuer-ca"
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: 'true'
   spec:
@@ -965,6 +965,7 @@ extraObjects:
     tls:
     - hosts:
       - traefik.k3d.localhost
+      secretName: traefik-crt
 # This will override the default Release Namespace for Helm.
 # It will not affect optional CRDs such as `ServiceMonitor` and `PrometheusRules`
 # namespaceOverride: traefik

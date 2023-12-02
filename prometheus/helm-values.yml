@@ -955,6 +955,7 @@ grafana:
     ## Annotations for Grafana Ingress
     ##
     annotations:
+      cert-manager.io/cluster-issuer: "cluster-issuer-ca"
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: 'true'
 
@@ -979,6 +980,7 @@ grafana:
     tls:
     - hosts:
       - grafana.k3d.localhost
+      secretName: grafana-crt
 
   sidecar:
     dashboards:
@@ -2777,6 +2779,7 @@ prometheus:
     # ingressClassName: nginx
 
     annotations:
+      cert-manager.io/cluster-issuer: "cluster-issuer-ca"
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: 'true'
     labels: {}
@@ -2807,6 +2810,7 @@ prometheus:
     tls:
     - hosts:
       - prometheus.k3d.localhost
+      secretName: prometheus-crt
       # - secretName: prometheus-general-tls
       #   hosts:
       #     - prometheus.example.com

@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- cluster-issuer.yml
+
+secretGenerator:
+- name: cluster-issuer-ca-cert
+  files:
+  - tls.crt=certs/inter/chain.crt
+  - tls.key=certs/inter/inter.key
