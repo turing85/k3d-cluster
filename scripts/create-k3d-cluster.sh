@@ -152,9 +152,13 @@ kubectl create namespace cert-manager
 kubectl apply \
   --filename ../cert-manager/helm/argocd-application.yml \
   --namespace argocd
+waitFor 2m \
+  "kustomize appl \
+    --kustomize ../cert-manager/certs \
+    --namespace cert-manager
 kubectl apply \
-  --filename ../cert-manager/kustomize/argocd-application.yml \
-  --namespace argocd
+  --kustomize ../cert-manager/issuer \
+  --namespace cert-manager
 
 kubectl apply \
   --filename ../prometheus/argocd-application.yml \

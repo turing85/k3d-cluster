@@ -210,7 +210,7 @@ ingress:
   ##
   tls:
   - hosts:
-    - dashboard.k3d.locahost
+    - dashboard.k3d.localhost
     secretName: dashboard-crt
 
 # Global dashboard settings
@@ -264,7 +264,7 @@ metricsScraper:
 ##  - https://github.com/kubernetes-sigs/metrics-server
 ##  - https://github.com/kubernetes-sigs/metrics-server/tree/master/charts/metrics-server
 metrics-server:
-  enabled: false
+  enabled: true
   ## Example for additional args
   # args:
   #  - --kubelet-preferred-address-types=InternalIP

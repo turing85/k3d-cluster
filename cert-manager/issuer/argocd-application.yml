@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster-ca-issuer
+  name: cluster-issuer-ca
 spec:
   destination:
     namespace: cert-manager

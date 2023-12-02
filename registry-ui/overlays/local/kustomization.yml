@@ -10,7 +10,7 @@ commonAnnotations:
   app.kubernetes.io/ingress-hostname: local.registry.k3d.localhost
   app.kubernetes.io/registry-interna-url: http://local.registry.localhost:5000
   app.kubernetes.io/site-title: Local Registry
-  app.kubernetes.io/tls-secretName: local-registry-ui-crt
+  app.kubernetes.io/ingress-tls-secretName: local-registry-ui-crt
 namePrefix: local
 
 replacements:
@@ -43,7 +43,7 @@ replacements:
 - source:
     kind: Ingress
     name: -registry-ui
-    fieldPath: metadata.annotations.app\.kubernetes\.io/tls-secretName
+    fieldPath: metadata.annotations.app\.kubernetes\.io/ingress-tls-secretName
   targets:
   - select:
       kind: Ingress
