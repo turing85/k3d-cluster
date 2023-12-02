@@ -147,18 +147,20 @@ kubectl apply \
   --filename ../traefik/argocd-application.yml \
   --namespace argocd
 
-../cert-manager/kustomize/certs/build-certs.sh
+../cert-manager/certs/build-certs.sh
 kubectl create namespace cert-manager
 kubectl apply \
   --filename ../cert-manager/helm/argocd-application.yml \
   --namespace argocd
+printf "Deploying Certificate chain for cert-manager"
 waitFor 2m \
-  "kustomize appl \
+  "kubectl apply \
     --kustomize ../cert-manager/certs \
-    --namespace cert-manager
+    --namespace cert-manager"
+echo " Done!"
 kubectl apply \
-  --kustomize ../cert-manager/issuer \
-  --namespace cert-manager
+  --filename ../cert-manager/issuer/argocd-application.yml \
+  --namespace argocd
 
 kubectl apply \
   --filename ../prometheus/argocd-application.yml \

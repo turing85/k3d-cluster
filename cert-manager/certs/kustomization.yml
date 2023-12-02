@@ -7,5 +7,5 @@ generatorOptions:
 secretGenerator:
 - name: cluster-issuer-ca-cert
   files:
-  - tls.crt=certs/inter/chain.crt
-  - tls.key=certs/inter/inter.key
+  - tls.crt=inter/chain.crt
+  - tls.key=inter/inter.key
