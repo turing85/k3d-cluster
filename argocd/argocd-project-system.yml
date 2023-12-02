@@ -19,6 +19,9 @@ spec:
     namespace: argocd
     server: https://kubernetes.default.svc
   - name: in-cluster
+    namespace: cert-manager
+    server: https://kubernetes.default.svc
+  - name: in-cluster
     namespace: monitoring
     server: https://kubernetes.default.svc
   - name: in-cluster

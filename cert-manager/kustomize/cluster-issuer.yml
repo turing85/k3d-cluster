@@ -2,7 +2,6 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: cluster-issuer-ca
-  namespace: sandbox
 spec:
   ca:
     secretName: cluster-issuer-ca-cert

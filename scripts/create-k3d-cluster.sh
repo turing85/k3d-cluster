@@ -81,10 +81,10 @@ docker run \
   || docker start quay.mirror.registry.localhost
 
 k3d cluster create local \
-  --config k3d-local.yml \
-  --registry-config k3d-registry.yml
+  --config ../k3d-local.yml \
+  --registry-config ../k3d-registry.yml
 
-kubeconfig="${K3D_KUBECONFIG:${HOME}/.kube/config.k3d}"
+kubeconfig="${K3D_KUBECONFIG:-${HOME}/.kube/config.k3d}"
 echo "" "${kubeconfig}"
 k3d kubeconfig merge local --output "${kubeconfig}"
 kubectl ctx k3d-local
@@ -98,14 +98,14 @@ echo " Done!"
 helm uninstall traefik-crd -n kube-system
 helm install \
   traefik traefik/traefik \
-  --values traefik/helm-values.yml \
+  --values ../traefik/helm-values.yml \
   --namespace kube-system
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts \
   || helm repo update prometheus-community
 helm install \
   prometheus-operator prometheus-community/kube-prometheus-stack \
-  --values prometheus/helm-values.yml \
+  --values ../prometheus/helm-values.yml \
   --namespace monitoring \
   --create-namespace
 
@@ -113,7 +113,7 @@ helm repo add argocd https://argoproj.github.io/argo-helm \
   || helm repo update argo-cd
 helm install \
   argocd argo-cd/argo-cd \
-  --values argocd/helm-values.yml \
+  --values ../argocd/helm-values.yml \
   --namespace argocd \
   --create-namespace
 
@@ -136,41 +136,41 @@ waitFor 2m \
 echo " Done!"
 
 kubectl apply \
-  --filename argocd/argocd-project-system.yml \
+  --filename ../argocd/argocd-project-system.yml \
   --namespace argocd
 
 kubectl apply \
-  --filename argocd/argocd-application.yml \
+  --filename ../argocd/argocd-application.yml \
   --namespace argocd
 
 kubectl apply \
-  --filename traefik/argocd-application.yml \
+  --filename ../traefik/argocd-application.yml \
   --namespace argocd
 
-cert-manager/kustomization/certs/build-certs.sh
+../cert-manager/kustomize/certs/build-certs.sh
 kubectl create namespace cert-manager
 kubectl apply \
-  --filename cert-manager/helm/argocd-application.yml \
-  --namespace cert-manager
+  --filename ../cert-manager/helm/argocd-application.yml \
+  --namespace argocd
 kubectl apply \
-  --filename cert-manager/kustomization/argocd-application.yml \
-  --namespace cert-manager
+  --filename ../cert-manager/kustomize/argocd-application.yml \
+  --namespace argocd
 
 kubectl apply \
-  --filename prometheus/argocd-application.yml \
+  --filename ../prometheus/argocd-application.yml \
   --namespace argocd
 
 kubectl create namespace kubernetes-dashboard
 kubectl apply \
-  --filename kubernetes-dashboard/argocd-application.yml \
+  --filename ../kubernetes-dashboard/argocd-application.yml \
   --namespace argocd
 
 kubectl create namespace registry-ui
 kubectl apply \
-  --filename registry-ui/argocd-application.yml \
+  --filename ../registry-ui/argocd-application.yml \
   --namespace argocd
 
 kubectl create namespace portainer
 kubectl apply \
-  --filename portainer/argocd-application.yml \
+  --filename ../portainer/argocd-application.yml \
   --namespace argocd
