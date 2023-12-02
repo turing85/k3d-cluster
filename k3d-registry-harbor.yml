@@ -1,8 +1,0 @@
-mirrors:
-  docker.io:
-    endpoint:
-    - "http://harbor-registry.harbor.svc.docker.local:5000"
-
-  quay.io:
-    endpoint:
-    - "http://harbor-registry.harbor.svc.docker.local:5000"

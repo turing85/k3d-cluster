@@ -42,6 +42,7 @@ spec:
   sourceRepos:
   - https://github.com/turing85/k3d-cluster.git
   - https://argoproj.github.io/argo-helm
+  - https://charts.jetstack.io # cert-manager
   - https://helm.goharbor.io
   - https://kubernetes.github.io/dashboard
   - https://prometheus-community.github.io/helm-charts
