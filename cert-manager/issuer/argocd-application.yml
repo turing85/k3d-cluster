@@ -8,7 +8,7 @@ spec:
     server: https://kubernetes.default.svc
   project: system
   source:
-    path: cert-manager/kustomize
+    path: cert-manager/issuer
     repoURL: https://github.com/turing85/k3d-cluster.git
     targetRevision: main
   syncPolicy:
