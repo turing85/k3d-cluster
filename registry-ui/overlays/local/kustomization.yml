@@ -12,6 +12,18 @@ commonAnnotations:
   app.kubernetes.io/site-title: Local Registry
 namePrefix: local
 
+patches:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+  patch: |
+    - op: add
+      path: /spec/template/spec/containers/0/env/-
+      value:
+        name: DELETE_IMAGES
+        value: 'true'
+
 replacements:
 - source:
     kind: Deployment

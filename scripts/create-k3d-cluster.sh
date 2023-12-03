@@ -19,6 +19,7 @@ docker run \
   --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods='["*"]' \
   --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin='["*"]' \
   --env REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers='[Docker-Content-Digest]' \
+  --env REGISTRY_STORAGE_DELETE_ENABLED=true \
   --name local.registry.localhost \
   --network k3d-local \
   --publish 5000:5000 \
