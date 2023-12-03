@@ -11,10 +11,10 @@ spec:
         image: docker.io/joxit/docker-registry-ui:2.5.6-debian
         imagePullPolicy: IfNotPresent
         env:
-        - name: SINGLE_REGISTRY
-          value: 'true'
         - name: REGISTRY_SECURED
           value: 'false'
+        - name: SINGLE_REGISTRY
+          value: 'true'
         ports:
         - containerPort: 80
           name: http
