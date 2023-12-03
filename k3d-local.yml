@@ -25,6 +25,9 @@ options:
     - arg: --system-default-registry=docker.mirror.registry.localhost:5000
       nodeFilters:
       - 'server:*'
+    - arg: --disable=traefik
+      nodeFilters:
+      - 'server:*'
   kubeconfig:
     updateDefaultKubeconfig: false
     switchCurrentContext: false
