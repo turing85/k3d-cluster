@@ -12,9 +12,8 @@ metadata:
   name: default-tls-crt
 spec:
   secretName: default-tls-crt
-  duration: 2160h # 90d
-  renewBefore: 360h # 15d
-  isCA: false
+  duration: 2160h0m0s
+  renewBefore: 360h0m0s # 15d
   privateKey:
     algorithm: RSA
     encoding: PKCS1
