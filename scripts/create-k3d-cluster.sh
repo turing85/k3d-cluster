@@ -119,31 +119,9 @@ k3d cluster create local \
 kubeconfig="${K3D_KUBECONFIG:-${HOME}/.kube/config.k3d}"
 echo "" > "${kubeconfig}"
 k3d kubeconfig merge local --output "${kubeconfig}" 1>/dev/null 2>/dev/null
-kubectl ctx k3d-local 1>/dev/null
+kubectl config use-context k3d-local 1>/dev/null
 
 mkdir -p "${log_dir}/helm"
-echo "Installing traefik through helm"
-helm repo add traefik https://traefik.github.io/charts 1>/dev/null || \
-  helm repo update traefik 1>/dev/null
-helm install \
-  traefik traefik/traefik \
-  --values ../traefik/helm-values.yml \
-  --namespace traefik \
-  --create-namespace \
-  1>"${log_dir}/helm/traefik.log" \
-  2>"${log_dir}/helm/traefik.err.log"
-
-echo "Installing prometheus through helm"
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 1>/dev/null \
-  || helm repo update prometheus-community 1>/dev/null
-helm install \
-  prometheus-operator prometheus-community/kube-prometheus-stack \
-  --values ../prometheus/helm-values.yml \
-  --namespace monitoring \
-  --create-namespace \
-  1>"${log_dir}/helm/prometheus.log" \
-  2>"${log_dir}/helm/prometheus.err.log"
-
 echo "Installing argocd through helm"
 helm repo add argocd https://argoproj.github.io/argo-helm 1>/dev/null \
   || helm repo update argo-cd 1>/dev/null
@@ -154,6 +132,17 @@ helm install \
   --create-namespace \
   1>"${log_dir}/helm/argocd.log" \
   2>"${log_dir}/helm/argocd.err.log"
+
+echo "Installing traefik through helm"
+helm repo add traefik https://traefik.github.io/charts 1>/dev/null || \
+  helm repo update traefik 1>/dev/null
+helm install \
+  traefik traefik/traefik \
+  --values ../traefik/helm-values.yml \
+  --namespace traefik \
+  --create-namespace \
+  1>"${log_dir}/helm/traefik.log" \
+  2>"${log_dir}/helm/traefik.err.log"
 
 printf "Waiting for ArgoCD to become ready.."
 waitFor 2m \
@@ -187,9 +176,6 @@ kubectl apply \
 
 echo "Installing cert-manager through argocd"
 ../cert-manager/certs/build-certs.sh
-kubectl create namespace cert-manager \
-  1>"${log_dir}/argocd/cert-manager.log" \
-  2>"${log_dir}/argocd/cert-manager.err.log"
 kubectl apply \
   --filename ../cert-manager/helm/argocd-application.yml \
   --namespace argocd \
@@ -215,9 +201,6 @@ kubectl apply \
   2>"${log_dir}/argocd/prometheus.err.log"
 
 echo "Installing kubernetes-dashboard through argocd"
-kubectl create namespace kubernetes-dashboard \
-  1>"${log_dir}/argocd/kubernetes-dashboard.log" \
-  2>"${log_dir}/argocd/kubernetes-dashboard.err.log"
 kubectl apply \
   --filename ../kubernetes-dashboard/argocd-application.yml \
   --namespace argocd \
@@ -225,9 +208,6 @@ kubectl apply \
   2>"${log_dir}/argocd/kubernetes-dashboard.err.log"
 
 echo "Installing UIs for image registres through argocd"
-kubectl create namespace registry-ui \
-  1>"${log_dir}/argocd/registry-ui.log" \
-  2>"${log_dir}/argocd/registry-ui.err.log"
 kubectl apply \
   --filename ../registry-ui/argocd-application.yml \
   --namespace argocd \
@@ -235,9 +215,6 @@ kubectl apply \
   2>"${log_dir}/argocd/registry-ui.err.log"
 
 echo "Installing portainer through argocd"
-kubectl create namespace portainer \
-  1>"${log_dir}/argocd/portainer.log" \
-  2>"${log_dir}/argocd/portainer.err.log"
 kubectl apply \
   --filename ../portainer/argocd-application.yml \
   --namespace argocd \
