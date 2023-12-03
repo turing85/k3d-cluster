@@ -23,7 +23,7 @@ spec:
   - key encipherment
   dnsNames:
   - '*.k3d.localhost'
-  - '*.registry.localhost'
+  - '*.registry.k3d.localhost'
   issuerRef:
     name: cluster-issuer-ca
     kind: ClusterIssuer
