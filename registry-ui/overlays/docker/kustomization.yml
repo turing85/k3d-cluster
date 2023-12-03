@@ -10,7 +10,6 @@ commonAnnotations:
   app.kubernetes.io/ingress-hostname: docker.registry.k3d.localhost
   app.kubernetes.io/registry-interna-url: http://docker.mirror.registry.localhost:5000
   app.kubernetes.io/site-title: Docker Registry Mirror
-  app.kubernetes.io/ingress-tls-secretName: docker-registry-ui-crt
 namePrefix: docker
 
 replacements:
@@ -38,18 +37,6 @@ replacements:
     fieldPaths:
     - spec.rules.[host=PLACEHOLDER].host
     - spec.tls.0.hosts.0
-    options:
-      create: true
-- source:
-    kind: Ingress
-    name: -registry-ui
-    fieldPath: metadata.annotations.app\.kubernetes\.io/ingress-tls-secretName
-  targets:
-  - select:
-      kind: Ingress
-      name: -registry-ui
-    fieldPaths:
-    - spec.tls.0.secretName
     options:
       create: true
 

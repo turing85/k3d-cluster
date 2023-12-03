@@ -14,7 +14,6 @@ kind: Ingress
 metadata:
   name: -registry-ui
   annotations:
-    cert-manager.io/cluster-issuer: "cluster-issuer-ca"
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: 'true'
 spec:
@@ -30,6 +29,3 @@ spec:
             name: -registry-ui
             port:
               name: http
-  tls:
-  - secretName: -registry-ui
----

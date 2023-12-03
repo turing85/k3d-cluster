@@ -211,7 +211,6 @@ ingress:
   tls:
   - hosts:
     - dashboard.k3d.localhost
-    secretName: dashboard-crt
 
 # Global dashboard settings
 settings: {}

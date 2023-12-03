@@ -980,7 +980,6 @@ grafana:
     tls:
     - hosts:
       - grafana.k3d.localhost
-      secretName: grafana-crt
 
   sidecar:
     dashboards:
@@ -2810,7 +2809,6 @@ prometheus:
     tls:
     - hosts:
       - prometheus.k3d.localhost
-      secretName: prometheus-crt
       # - secretName: prometheus-general-tls
       #   hosts:
       #     - prometheus.example.com

@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster-issuer-ca
+  name: default-tls-crt
 spec:
   destination:
     namespace: cert-manager
     server: https://kubernetes.default.svc
   project: system
   source:
-    path: cert-manager/issuer
+    path: cert-manager/default-tls-crt
     repoURL: https://github.com/turing85/k3d-cluster.git
     targetRevision: main
   syncPolicy:

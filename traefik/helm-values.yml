@@ -144,7 +144,7 @@ experimental:
 ingressRoute:
   dashboard:
     # -- Create an IngressRoute for the dashboard
-    enabled: true
+    enabled: false
     # -- Additional ingressRoute annotations (e.g. for kubernetes.io/ingress.class)
     annotations: {}
     # -- Additional ingressRoute labels (e.g. for filtering IngressRoute by custom labels)
@@ -543,9 +543,6 @@ globalArguments:
 ## Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
 additionalArguments:
 - --api.insecure=true
-- --entrypoints.web.http.redirections.entrypoint.to=websecure
-- --entrypoints.web.http.redirections.entrypoint.scheme=https
-- --entrypoints.web.http.redirections.entrypoint.permanent=true
 #  - "--providers.kubernetesingress.ingressclass=traefik-internal"
 #  - "--log.level=DEBUG"
 
@@ -620,20 +617,20 @@ ports:
     # Port Redirections
     # Added in 2.2, you can make permanent redirects via entrypoints.
     # https://docs.traefik.io/routing/entrypoints/#redirection
-    # redirectTo:
-    #   port: websecure
-    #   (Optional)
-    #   priority: 10
-    #
-    # Trust forwarded  headers information (X-Forwarded-*).
-    # forwardedHeaders:
-    #   trustedIPs: []
-    #   insecure: false
-    #
-    # Enable the Proxy Protocol header parsing for the entry point
-    # proxyProtocol:
-    #   trustedIPs: []
-    #   insecure: false
+    redirectTo:
+      port: websecure
+      #  (Optional)
+      #  priority: 10
+      #
+      # Trust forwarded  headers information (X-Forwarded-*).
+      # forwardedHeaders:
+      #   trustedIPs: []
+      #   insecure: false
+      #
+      # Enable the Proxy Protocol header parsing for the entry point
+      # proxyProtocol:
+      #   trustedIPs: []
+      #   insecure: false
   websecure:
     ## -- Enable this entrypoint as a default entrypoint. When a service doesn't explicitly set an entrypoint it will only use this entrypoint.
     # asDefault: true
@@ -732,7 +729,10 @@ tlsOptions: {}
 #   default:
 #     defaultCertificate:
 #       secretName: tls-cert
-tlsStore: {}
+tlsStore:
+  default:
+    defaultCertificate:
+      secretName: default-tls-crt
 
 service:
   enabled: true
@@ -965,7 +965,6 @@ extraObjects:
     tls:
     - hosts:
       - traefik.k3d.localhost
-      secretName: traefik-crt
 # This will override the default Release Namespace for Helm.
 # It will not affect optional CRDs such as `ServiceMonitor` and `PrometheusRules`
 # namespaceOverride: traefik

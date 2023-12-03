@@ -159,7 +159,7 @@ waitFor 2m \
     --namespace cert-manager"
 echo " Done!"
 kubectl apply \
-  --filename ../cert-manager/issuer/argocd-application.yml \
+  --filename ../cert-manager/default-tls-crt/argocd-application.yml \
   --namespace argocd
 
 kubectl apply \
