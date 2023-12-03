@@ -1,4 +1,5 @@
 = k3d local cluster setup
+
 This project is a collection of scripts, configurations, helm values and kustomizations to deploy a dev k3d cluster with some services pre-installed and exposed.
 
 == Prerequsites
@@ -14,12 +15,12 @@ There are some prerequisistes necessary to run this project:
 ** `openssl`
 * An internet connection
 
-== What is pre-installed?
+== What is provided?
 
 === Scripts
 Scripts to create, start, stop and delete the cluster can be found in directory `scripts`.
 
-The connection-config to the cluster is written to the config-file in environment variable `K3D_KUBECONFIG`, defaulting to `${HOME}/.kube/config.k3d}`
+The connection-config to the cluster is written to the config-file in environment variable `K3D_KUBECONFIG`, defaulting to `${HOME}/.kube/config.k3d`
 
 === Services
 * ArgoCD available at link:https://argocd.k3d.localhost[]

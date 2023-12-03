@@ -258,11 +258,11 @@ echo "    https://local.registry.k3d.localhost"
 echo "    https://docker.registry.k3d.localhost (dockerhub mirror)"
 echo "    https://quay.registry.k3d.localhost (quay.io mirror)"
 echo
-echo "The system  provides a registry"
+echo "The system  provides a registry at"
 echo "    local.registry.localhost:5000"
 echo
 echo "If you want to deploy custom images, push them into this registry."
-echo "To deploy the, reference them as local.registry.localhost:5000/<image-name>:<image-tag>"
+echo "To deploy images from this registry, reference them as local.registry.localhost:5000/<image-name>:<image-tag>"
 echo
 echo "All endpoints (except for the registry) are TLS-secured by default. You can find the self-signed CA certificate under"
 echo "    cert-manager/certs/ca/ca.crt"
