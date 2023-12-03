@@ -181,3 +181,48 @@ kubectl create namespace portainer
 kubectl apply \
   --filename ../portainer/argocd-application.yml \
   --namespace argocd
+
+urls=( \
+  "https://dashboard.k3d.localhost" \
+  "https://argocd.k3d.localhost" \
+  "https://grafana.k3d.localhost" \
+  "https://prometheus.k3d.localhost" \
+  "https://traefik.k3d.localhost" \
+  "https://local.registry.k3d.localhost" \
+  "https://docker.registry.k3d.localhost" \
+  "https://quay.registry.k3d.localhost" \
+)
+for url in "${urls[@]}"
+do
+  printf "Waiting for ${url} to becomen reachable"
+  waitFor 2m \
+    "curl \
+      --cacert ../cert-manager/certs/ca/ca.crt \
+      --fail \
+      --insecure \
+      --silent \
+      ${url}"
+  echo " Done!"
+done
+
+
+echo "Cluster is started up!"
+echo
+echo "The following Services are provided out of the box:"
+echo "    https://dashboard.k3d.localhost"
+echo "    https://argocd.k3d.localhost"
+echo "    https://grafana.k3d.localhost (username: 'admin', password: 'prom-operator')"
+echo "    https://prometheus.k3d.localhost"
+echo "    https://traefik.k3d.localhost"
+echo "    https://local.registry.k3d.localhost"
+echo "    https://docker.registry.k3d.localhost (dockerhub mirror)"
+echo "    https://quay.registry.k3d.localhost (quay.io mirror)"
+echo
+echo "The system  provides a registry"
+echo "    local.registry.localhost"
+echo
+echo "If you want to deploy custom images, push them into this registry."
+echo "To deploy the, reference them as local.registry.localhost:5000/<image-name>:<image-tag>"
+echo
+echo "All endpoints (except for the registry) are TLS-secured by default. You can find the self-signed CA certificate under"
+echo "    cert-manager/certs/ca/ca.crt
