@@ -1,5 +1,5 @@
 {
-  "projectName": "advent-of-code-2022",
+  "projectName": "k3d-cluster",
   "projectOwner": "turing85",
   "files": [
     "CONTRIBUTORS.md",
@@ -18,8 +18,18 @@
         "maintenance",
         "infra"
       ]
+    },
+    {
+      "login": "jbierboms",
+      "name": "jbierboms",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11670769?v=4",
+      "profile": "https://github.com/jbierboms",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "commitConvention": "angular",
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "commitType": "docs"
 }
