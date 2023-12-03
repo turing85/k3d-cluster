@@ -2,23 +2,30 @@
 set -e
 
 function waitFor() {
-  timeout -k "${1}" "${1}" bash -c "while :
-    printf '.'
-    do
-    ${2} 1>/dev/null 2>/dev/null && break
-    sleep 5
-    done"
+  timeout \
+    --foreground \
+    --kill-after "${1}" \
+    "${1}" \
+    bash -c \
+      "while :
+        printf '.'
+      do
+        ${2} 1>/dev/null 2>/dev/null && break
+        sleep 5
+      done"
 }
 
 cd -- "$(dirname "$(readlink -f "$0")")" &> /dev/null
 log_dir="../logs"
-mkdir -p ${log_dir}
-rm -rf ${log_dir}/
+mkdir -p "${log_dir}"
+rm -rf "${log_dir:?}/"
 
 k3d_version="$(k3d --version | head -n 1 | sed 's|k3d version v\(.*\)$*|\1|g')"
 
-mkdir -p ${log_dir}/docker
-echo "starting local registry"
+mkdir -p "${log_dir}/docker"
+kubectl config unset users.admin@k3d-local 1>/dev/null
+kubectl config unset clusters.k3d-local 1>/dev/null
+kubectl config unset contexts.k3d-local 1>/dev/null
 docker run \
   --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
   --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods='["*"]' \
@@ -40,11 +47,11 @@ docker run \
   --restart=unless-stopped \
   --detach \
   docker.io/library/registry:2.8.2 \
-  1>${log_dir}/docker/docker_local_registry.log \
-  2>${log_dir}/docker/docker_local_registry.err.log \
+  1>"${log_dir}/docker/docker_local_registry.log" \
+  2>"${log_dir}/docker/docker_local_registry.err.log" \
   || docker start local.registry.localhost \
-    1>${log_dir}/docker/docker_local_registry.log \
-    2>${log_dir}/docker/docker_local_registry.err.log
+    1>"${log_dir}/docker/docker_local_registry.log" \
+    2>"${log_dir}/docker/docker_local_registry.err.log"
 
 echo "starting docker registry mirror"
 docker run \
@@ -67,12 +74,12 @@ docker run \
   --label k3s.registry.port.internal=5000 \
   --restart=unless-stopped \
   --detach \
-  docker.io/library/registry:2.8.2 2>/dev/null \
-  1>${log_dir}/docker/docker_docker_registry.log \
-  2>${log_dir}/docker/docker_docker_registry.err.log \
+  docker.io/library/registry:2.8.2 \
+  1>"${log_dir}/docker/docker_docker_registry.log" \
+  2>"${log_dir}/docker/docker_docker_registry.err.log" \
   || docker start docker.mirror.registry.localhost \
-    1>${log_dir}/docker/docker_docker_registry.log \
-    2>${log_dir}/docker/docker_docker_registry.err.log \
+    1>"${log_dir}/docker/docker_docker_registry.log" \
+    2>"${log_dir}/docker/docker_docker_registry.err.log" \
 
 echo "starting quay registry mirror"
 docker run \
@@ -95,26 +102,26 @@ docker run \
   --label k3s.registry.port.internal=5000 \
   --restart=unless-stopped \
   --detach \
-  docker.io/library/registry:2.8.2 2>/dev/null \
-  1>${log_dir}/docker/docker_quay_registry.log \
-  2>${log_dir}/docker/docker_quay_registry.err.log \
+  docker.io/library/registry:2.8.2 \
+  1>"${log_dir}/docker/docker_quay_registry.log" \
+  2>"${log_dir}/docker/docker_quay_registry.err.log" \
   || docker start quay.mirror.registry.localhost \
-    1>${log_dir}/docker/docker_quay_registry.log \
-    2>${log_dir}/docker/docker_quay_registry.err.log \
+    1>"${log_dir}/docker/docker_quay_registry.log" \
+    2>"${log_dir}/docker/docker_quay_registry.err.log" \
 
 echo "starting k3s"
 k3d cluster create local \
   --config ../k3d-local.yml \
   --registry-config ../k3d-registry.yml \
-  1>${log_dir}/k3s.log \
-  2>${log_dir}/k3s.err.log \
+  1>"${log_dir}/k3s.log" \
+  2>"${log_dir}/k3s.err.log" \
 
 kubeconfig="${K3D_KUBECONFIG:-${HOME}/.kube/config.k3d}"
-echo "" "${kubeconfig}"
-k3d kubeconfig merge local --output "${kubeconfig}" 1>/dev/null
+echo "" > "${kubeconfig}"
+k3d kubeconfig merge local --output "${kubeconfig}" 1>/dev/null 2>/dev/null
 kubectl ctx k3d-local 1>/dev/null
 
-mkdir -p ${log_dir}/helm
+mkdir -p "${log_dir}/helm"
 echo "Installing traefik through helm"
 helm repo add traefik https://traefik.github.io/charts 1>/dev/null || \
   helm repo update traefik 1>/dev/null
@@ -123,8 +130,8 @@ helm install \
   --values ../traefik/helm-values.yml \
   --namespace traefik \
   --create-namespace \
-  1>${log_dir}/helm/traefik.log \
-  2>${log_dir}/helm/traefik.err.log
+  1>"${log_dir}/helm/traefik.log" \
+  2>"${log_dir}/helm/traefik.err.log"
 
 echo "Installing prometheus through helm"
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts 1>/dev/null \
@@ -134,8 +141,8 @@ helm install \
   --values ../prometheus/helm-values.yml \
   --namespace monitoring \
   --create-namespace \
-  1>${log_dir}/helm/prometheus.log \
-  2>${log_dir}/helm/prometheus.err.log
+  1>"${log_dir}/helm/prometheus.log" \
+  2>"${log_dir}/helm/prometheus.err.log"
 
 echo "Installing argocd through helm"
 helm repo add argocd https://argoproj.github.io/argo-helm 1>/dev/null \
@@ -145,59 +152,50 @@ helm install \
   --values ../argocd/helm-values.yml \
   --namespace argocd \
   --create-namespace \
-  1>${log_dir}/helm/argocd.log \
-  2>${log_dir}/helm/argocd.err.log
+  1>"${log_dir}/helm/argocd.log" \
+  2>"${log_dir}/helm/argocd.err.log"
 
-printf "Waiting for ArgoCD to become available"
+printf "Waiting for ArgoCD to become ready.."
 waitFor 2m \
-    "kubectl get secret/argocd-initial-admin-secret --namespace argocd"
-waitFor 2m \
-  "argocd login \
+  "curl \
+    --fail \
     --insecure \
-    --grpc-web \
-    --username admin \
-    --password $( \
-        kubectl get secret/argocd-initial-admin-secret \
-          --output yaml \
-          --namespace argocd \
-          | yq .data.password \
-          | base64 --decode \
-    ) \
-    argocd.k3d.localhost"
+    --silent \
+    https://argocd.k3d.localhost"
 echo " Done!"
 
-mkdir -p ${log_dir}/argocd
+mkdir -p "${log_dir}/argocd"
 echo "Re-installing argocd through argocd"
 kubectl apply \
   --filename ../argocd/argocd-project-system.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/argocd.log \
-  2>${log_dir}/argocd/argocd.err.log
+  1>"${log_dir}/argocd/argocd.log" \
+  2>"${log_dir}/argocd/argocd.err.log"
 
 kubectl apply \
   --filename ../argocd/argocd-application.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/argocd.log \
-  2>${log_dir}/argocd/argocd.err.log
+  1>"${log_dir}/argocd/argocd.log" \
+  2>"${log_dir}/argocd/argocd.err.log"
 
 echo "Re-installing traefik through argocd"
 kubectl apply \
   --filename ../traefik/argocd-application.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/traefik.log \
-  2>${log_dir}/argocd/traefik.err.log
+  1>"${log_dir}/argocd/traefik.log" \
+  2>"${log_dir}/argocd/traefik.err.log"
 
 echo "Installing cert-manager through argocd"
 ../cert-manager/certs/build-certs.sh
 kubectl create namespace cert-manager \
-  1>${log_dir}/argocd/cert-manager.log \
-  2>${log_dir}/argocd/cert-manager.err.log
+  1>"${log_dir}/argocd/cert-manager.log" \
+  2>"${log_dir}/argocd/cert-manager.err.log"
 kubectl apply \
   --filename ../cert-manager/helm/argocd-application.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/cert-manager.log \
-  2>${log_dir}/argocd/cert-manager.err.log
-printf "Deploying Certificate chain for cert-manager"
+  1>"${log_dir}/argocd/cert-manager.log" \
+  2>"${log_dir}/argocd/cert-manager.err.log"
+printf "Deploying Certificate chain for cert-manager.."
 waitFor 2m \
   "kubectl apply \
     --kustomize ../cert-manager/certs \
@@ -206,40 +204,48 @@ echo " Done!"
 kubectl apply \
   --filename ../cert-manager/default-tls-crt/argocd-application.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/cert-manager.log \
-  2>${log_dir}/argocd/cert-manager.err.log
+  1>"${log_dir}/argocd/cert-manager.log" \
+  2>"${log_dir}/argocd/cert-manager.err.log"
 
 echo "Re-installing prometheus through argocd"
 kubectl apply \
   --filename ../prometheus/argocd-application.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/prometheus.log \
-  2>${log_dir}/argocd/prometheus.err.log
+  1>"${log_dir}/argocd/prometheus.log" \
+  2>"${log_dir}/argocd/prometheus.err.log"
 
 echo "Installing kubernetes-dashboard through argocd"
-kubectl create namespace kubernetes-dashboard
+kubectl create namespace kubernetes-dashboard \
+  1>"${log_dir}/argocd/kubernetes-dashboard.log" \
+  2>"${log_dir}/argocd/kubernetes-dashboard.err.log"
 kubectl apply \
   --filename ../kubernetes-dashboard/argocd-application.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/kubernetes-dashboard.log \
-  2>${log_dir}/argocd/kubernetes-dashboard.err.log
+  1>"${log_dir}/argocd/kubernetes-dashboard.log" \
+  2>"${log_dir}/argocd/kubernetes-dashboard.err.log"
 
 echo "Installing UIs for image registres through argocd"
-kubectl create namespace registry-ui
+kubectl create namespace registry-ui \
+  1>"${log_dir}/argocd/registry-ui.log" \
+  2>"${log_dir}/argocd/registry-ui.err.log"
 kubectl apply \
   --filename ../registry-ui/argocd-application.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/registry-ui.log \
-  2>${log_dir}/argocd/registry-ui.err.log
+  1>"${log_dir}/argocd/registry-ui.log" \
+  2>"${log_dir}/argocd/registry-ui.err.log"
 
 echo "Installing portainer through argocd"
-kubectl create namespace portainer
+kubectl create namespace portainer \
+  1>"${log_dir}/argocd/portainer.log" \
+  2>"${log_dir}/argocd/portainer.err.log"
 kubectl apply \
   --filename ../portainer/argocd-application.yml \
   --namespace argocd \
-  1>${log_dir}/argocd/portainer.log \
-  2>${log_dir}/argocd/portainer.err.log
+  1>"${log_dir}/argocd/portainer.log" \
+  2>"${log_dir}/argocd/portainer.err.log"
 
+echo
+echo "Asserting that all deployed services are reachable"
 urls=( \
   "https://dashboard.k3d.localhost" \
   "https://argocd.k3d.localhost" \
@@ -252,12 +258,11 @@ urls=( \
 )
 for url in "${urls[@]}"
 do
-  printf "Waiting for ${url} to becomen reachable"
+  printf "Waiting for %s to becomen reachable.." "${url}"
   waitFor 2m \
     "curl \
       --cacert ../cert-manager/certs/ca/ca.crt \
       --fail \
-      --insecure \
       --silent \
       ${url}"
   echo " Done!"
