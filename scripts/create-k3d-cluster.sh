@@ -99,7 +99,8 @@ helm uninstall traefik-crd -n kube-system
 helm install \
   traefik traefik/traefik \
   --values ../traefik/helm-values.yml \
-  --namespace kube-system
+  --namespace traefik \
+  --create-namespace
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts \
   || helm repo update prometheus-community

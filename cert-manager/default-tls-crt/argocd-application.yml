@@ -4,7 +4,7 @@ metadata:
   name: default-tls-crt
 spec:
   destination:
-    namespace: cert-manager
+    namespace: traefik
     server: https://kubernetes.default.svc
   project: system
   source:
