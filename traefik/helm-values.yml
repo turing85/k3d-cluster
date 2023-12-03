@@ -534,7 +534,7 @@ tracing: {}
 # -- Global command arguments to be passed to all traefik's pods
 globalArguments:
 - "--global.checknewversion"
-- "--global.sendanonymoususage"
+- "--global.sendanonymoususage=false"
 
 #
 # Configure Traefik static configuration
