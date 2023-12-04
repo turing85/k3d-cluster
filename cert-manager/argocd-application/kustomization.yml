@@ -17,7 +17,7 @@ patches:
       path: /spec/destination/namespace
       value: cert-manager
     - op: add
-      path: /spec/sources/-
+      path: /spec/sources/0
       value:
         chart: cert-manager
         helm:
