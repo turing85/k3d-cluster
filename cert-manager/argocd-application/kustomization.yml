@@ -19,7 +19,7 @@ patches:
     - op: add
       path: /spec/sources/-
       value:
-        chart: argo-cd
+        chart: cert-manager
         helm:
           releaseName: cert-manager
           valueFiles:

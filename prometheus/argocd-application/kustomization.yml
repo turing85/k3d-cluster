@@ -19,7 +19,7 @@ patches:
     - op: add
       path: /spec/sources/-
       value:
-        chart: prometheus-operator
+        chart: kube-prometheus-stack
         helm:
           releaseName: prometheus-operator
           valueFiles:
