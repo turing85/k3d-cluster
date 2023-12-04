@@ -1,8 +1,12 @@
 mirrors:
   docker.io:
     endpoint:
-      - "http://docker.mirror.registry.localhost:5000"
+    - "http://docker.mirror.registry.localhost:5000"
 
   quay.io:
     endpoint:
-      - "http://quay.mirror.registry.localhost:5000"
+    - "http://quay.mirror.registry.localhost:5000"
+
+  registry.k8s.io:
+    endpoint:
+    - "http://k8s-community.mirror.registry.localhost:5000"

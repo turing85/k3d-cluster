@@ -5,3 +5,4 @@ resources:
 - local
 - docker
 - quay
+- k8s-community
