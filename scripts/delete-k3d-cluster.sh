@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
+KUBECONFIG="${K3D_KUBECONFIG:-${HOME}/.kube/config.k3d}" 
 k3d cluster delete local || true
 kubectl config unset users.admin@k3d-local
 kubectl config unset clusters.k3d-local

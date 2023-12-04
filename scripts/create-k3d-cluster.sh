@@ -47,11 +47,11 @@ docker run \
   --restart=unless-stopped \
   --detach \
   docker.io/library/registry:2.8.2 \
-  1>"${log_dir}/docker/docker_local_registry.log" \
-  2>"${log_dir}/docker/docker_local_registry.err.log" \
+  1>"${log_dir}/docker/local_registry.log" \
+  2>"${log_dir}/docker/local_registry.err.log" \
   || docker start local.registry.localhost \
-    1>"${log_dir}/docker/docker_local_registry.log" \
-    2>"${log_dir}/docker/docker_local_registry.err.log"
+    1>"${log_dir}/docker/local_registry.log" \
+    2>"${log_dir}/docker/local_registry.err.log"
 
 echo "starting docker registry mirror"
 docker run \
@@ -75,11 +75,11 @@ docker run \
   --restart=unless-stopped \
   --detach \
   docker.io/library/registry:2.8.2 \
-  1>"${log_dir}/docker/docker_docker_registry.log" \
-  2>"${log_dir}/docker/docker_docker_registry.err.log" \
+  1>"${log_dir}/docker/docker_registry_mirror.log" \
+  2>"${log_dir}/docker/docker_registry_mirror.err.log" \
   || docker start docker.mirror.registry.localhost \
-    1>"${log_dir}/docker/docker_docker_registry.log" \
-    2>"${log_dir}/docker/docker_docker_registry.err.log" \
+    1>"${log_dir}/docker/docker_registry_mirror.log" \
+    2>"${log_dir}/docker/docker_registry_mirror.err.log" \
 
 echo "starting quay registry mirror"
 docker run \
@@ -103,11 +103,11 @@ docker run \
   --restart=unless-stopped \
   --detach \
   docker.io/library/registry:2.8.2 \
-  1>"${log_dir}/docker/docker_quay_registry.log" \
-  2>"${log_dir}/docker/docker_quay_registry.err.log" \
+  1>"${log_dir}/docker/quay_registry_mirror.log" \
+  2>"${log_dir}/docker/quay_registry_mirror.err.log" \
   || docker start quay.mirror.registry.localhost \
-    1>"${log_dir}/docker/docker_quay_registry.log" \
-    2>"${log_dir}/docker/docker_quay_registry.err.log" \
+    1>"${log_dir}/docker/quay_registry_mirror.log" \
+    2>"${log_dir}/docker/quay_registry_mirror.err.log" \
 
 echo "starting k3s"
 kubectl config unset users.admin@k3d-local 1>/dev/null
