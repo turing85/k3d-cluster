@@ -2,7 +2,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: system
-  namespace: argocd
 spec:
   clusterResourceWhitelist:
   - group: '*'
@@ -47,4 +46,3 @@ spec:
   - https://kubernetes.github.io/dashboard
   - https://prometheus-community.github.io/helm-charts
   - https://traefik.github.io/charts
-status: {}

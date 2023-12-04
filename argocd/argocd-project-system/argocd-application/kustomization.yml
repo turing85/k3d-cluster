@@ -12,10 +12,10 @@ patches:
   patch: |
     - op: replace
       path: /metadata/name
-      value: default-tls-crt
+      value: argocd-project-system
     - op: add
       path: /spec/destination/namespace
-      value: traefik
+      value: argocd
     - op: add
       path: /spec/source/path
-      value: cert-manager/default-tls-crt
+      value: argocd/argocd-project-system/

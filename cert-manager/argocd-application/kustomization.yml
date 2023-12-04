@@ -23,6 +23,6 @@ patches:
         helm:
           releaseName: cert-manager
           valueFiles:
-          - $values/argocd/cert-manager/helm-values.yml
+          - $values/cert-manager/helm-values.yml
         repoURL: https://charts.jetstack.io
         targetRevision: 1.13.2

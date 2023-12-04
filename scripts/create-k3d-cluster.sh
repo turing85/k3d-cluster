@@ -158,20 +158,27 @@ echo " Done!"
 mkdir -p "${log_dir}/argocd"
 echo "Re-installing argocd through argocd"
 kubectl apply \
-  --filename ../argocd/argocd-project-system.yml \
+  --kustomize ../argocd/argocd-project-system \
   --namespace argocd \
-  1>"${log_dir}/argocd/argocd.log" \
-  2>"${log_dir}/argocd/argocd.err.log"
-
+  1>"${log_dir}/argocd/argocd-project-system.log" \
+  2>"${log_dir}/argocd/argocd-project-system.err.log"
 kubectl apply \
-  --filename ../argocd/argocd-application.yml \
+  --kustomize ../argocd/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/argocd.log" \
   2>"${log_dir}/argocd/argocd.err.log"
+printf "Waiting for ArgoCD to become ready.."
+waitFor 2m \
+  "curl \
+    --fail \
+    --insecure \
+    --silent \
+    https://argocd.k3d.localhost"
+echo " Done!"
 
 echo "Re-installing traefik through argocd"
 kubectl apply \
-  --filename ../traefik/argocd-application.yml \
+  --kustomize ../traefik/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/traefik.log" \
   2>"${log_dir}/argocd/traefik.err.log"
@@ -179,7 +186,7 @@ kubectl apply \
 echo "Installing cert-manager through argocd"
 ../cert-manager/certs/build-certs.sh
 kubectl apply \
-  --filename ../cert-manager/helm/argocd-application.yml \
+  --kustomize ../cert-manager/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/cert-manager.log" \
   2>"${log_dir}/argocd/cert-manager.err.log"
@@ -190,35 +197,35 @@ waitFor 2m \
     --namespace cert-manager"
 echo " Done!"
 kubectl apply \
-  --filename ../cert-manager/default-tls-crt/argocd-application.yml \
+  --kustomize ../cert-manager/default-tls-crt/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/cert-manager.log" \
   2>"${log_dir}/argocd/cert-manager.err.log"
 
 echo "Re-installing prometheus through argocd"
 kubectl apply \
-  --filename ../prometheus/argocd-application.yml \
+  --kustomize ../prometheus/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/prometheus.log" \
   2>"${log_dir}/argocd/prometheus.err.log"
 
 echo "Installing kubernetes-dashboard through argocd"
 kubectl apply \
-  --filename ../kubernetes-dashboard/argocd-application.yml \
+  --kustomize ../kubernetes-dashboard/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/kubernetes-dashboard.log" \
   2>"${log_dir}/argocd/kubernetes-dashboard.err.log"
 
 echo "Installing UIs for image registres through argocd"
 kubectl apply \
-  --filename ../registry-ui/argocd-application.yml \
+  --kustomize ../registry-ui/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/registry-ui.log" \
   2>"${log_dir}/argocd/registry-ui.err.log"
 
 echo "Installing portainer through argocd"
 kubectl apply \
-  --filename ../portainer/argocd-application.yml \
+  --kustomize ../portainer/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/portainer.log" \
   2>"${log_dir}/argocd/portainer.err.log"

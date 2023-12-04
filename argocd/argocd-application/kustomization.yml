@@ -23,6 +23,6 @@ patches:
         helm:
           releaseName: argocd
           valueFiles:
-          - $values/argocd/argocd-application/helm-values.yml
+          - $values/argocd/helm-values.yml
         repoURL: https://argoproj.github.io/argo-helm
         targetRevision: 5.51.5
