@@ -31,7 +31,7 @@ The flow is as follows:
 
 [NOTE]
 ====
-The first creation of the cluster will take a while since all images will be pulled. Subsequent cluster creations will be faster of the volume mounts for the registry and the mirrors are not deleted.
+The first creation of a cluster will take a while since all images will be pulled. Subsequent cluster creations will be faster if the volume mounts for the registry and the mirrors are not deleted.
 ====
 
 The scripts are not sensitive to the location they are called from; we can call them from everywhere. For convenience, we can link them to `${HOME}/.local/bin`:
