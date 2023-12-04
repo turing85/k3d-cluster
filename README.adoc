@@ -8,7 +8,7 @@ There are some prerequisistes necessary to run this project:
 * DNS names of the form `.*k3d.localhost` must resolve to `localhost` (i.e. `127.0.0.1`)
 * Software installed:
 ** link:https://www.docker.com/[`docker` (`www.docker.com`)], or a container runtime that is compatible with docker (and has an alias to the `docker` command), e.g. link:https://podman.io/[`podman` (`podman.io`)]
-** link:https://kubernetes.io/docs/reference/kubectl/[`kubectl` cli(`kubernetes.io`)]
+** link:https://kubernetes.io/docs/reference/kubectl/[`kubectl` cli (`kubernetes.io`)]
 ** link:https://helm.sh/[`helm` cli (`helm.sh`)]
 ** link:https://k3d.io/[`k3d` cli (`k3d.io`)]
 ** link:https://curl.se/[`curl` (`curl.se`)]
@@ -20,25 +20,49 @@ There are some prerequisistes necessary to run this project:
 === Scripts
 Scripts to create, start, stop and delete the cluster can be found in directory `scripts`.
 
-The connection-config to the cluster is written to the config-file in environment variable `K3D_KUBECONFIG`, defaulting to `${HOME}/.kube/config.k3d`
+The connection-config to the cluster is written to the config-file in environment variable `K3D_KUBECONFIG`, defaulting to `${HOME}/.kube/config.k3d`.
+
+The flow is as follows:
+
+* to create a cluster, we call link:scripts/create-k3d-cluster.sh[`create-k3d-cluster.sh`]
+* to stop (suspend) the cluste,r we call link:scripts/stop-k3d-cluster.sh[`stop-k3d-cluster.sh`]. This will not delete anything.
+* to start (resume) the cluste,r we call link:scripts/start-k3d-cluster.sh[`start-k3d-cluster.sh`]. This can only start clusters, that were previously created and stopped.
+* to delete a created cluster, we call link:scripts/delete-k3d-cluster.sh[`delete-k3d-cluster.sh`]. The image registries that were created are only stopped, not removed (i.e. we can still see them when running `docker ps -a`). If we subsequently create a new cluster, the same registry-containers (and volumes!) will be used, thus the images will be pulled from the mirrors, not from upstream.
+
+The scripts are not sensitive to the location they are called from; we can call them from everywhere. For convenience, we can link them to `${HOME}/.local/bin`:
+
+.Link scripts to `${HOME}/.local/bin`
+[source,bash]
+----
+cd /path/to/k3d-cluster/scripts
+mapfile -t scripts < <(find . -name '*.sh')
+for script in "${scripts[@]}"
+do
+  script_without_extension=$(basename "${script/.sh//}")
+  ln -s "$(pwd)/${script}" "${HOME}/.local/bin/${script_without_extension}"
+done
+cd -
+----
+
+If `${HOME}/.local/bin` is on our `${PATH}`, then we can call the scripts (without the `.sh` extension) from everywhere.
 
 === Services
-* ArgoCD available at link:https://argocd.k3d.localhost[]
-* kubernetes-dashboad, available at link:https://dashboard.k3d.localhost[]
-* Grafana and Prometheus, available at link:https://grafana.k3d.localhost[] and link:https://prometheus.k3d.localhost[] respectively
+* link:https://argoproj.github.io/cd/[ArgoCD (`argoproj.github.io`)]available at link:https://argocd.k3d.localhost[`https://argocd.k3d.localhost`]
+* :link:https://github.com/kubernetes/dashboard[kubernetes-dashboad (`github.com`)], available at link:https://dashboard.k3d.localhost[`https://dashboard.k3d.localhos`]
+* link:https://prometheus.io/[Prometheus (`https://prometheus.io`)] and link:https://grafana.com/[Grafana (`grafana.com`)], available at link:https://prometheus.k3d.localhost[`link:https://prometheus.k3d.localhost`] and link:https://grafana.k3d.localhost[`https://grafana.k3d.localhost`] respectively
 ** The credentials for grafana are `admin`/`prom-operator`
-* traefik, the dashboard is available at link:https://traefik.k3d.localhost[]
-* cert-manager
-* portainer-agent to connect the cluster to portainer
+* link:https://doc.traefik.io/traefik/[traefik (`doc.traefik.io`)], the dashboard is available at link:https://traefik.k3d.localhost[`https://traefik.k3d.localhost`]
+* link:https://cert-manager.io/[cert-manager (`cert-manager.io`)]
+* link:https://docs.portainer.io/admin/environments/add/kubernetes/agent[portainer-agent (`docs.portainer.io`)] to connect the cluster to portainer
 
 === Image registres and mirrors
 To improve the startup time of the cluster and make the cluster "offline-ready", we also deploy three image registries through the container runtime environment. Two registires are mirrors for `docker.com` and `quay.io`, one local registry to which we can push our images. The local registry is available on `localhost`, port `5000`. From within the cluster, the registry can be referenced through `local.registry.localhost:5000`.
 
 For each of this registries, we also deploy a small web-ui. They are available at
 
-* link:https://local.registry.k3d.localhost[]
-* link:https://docker.registry.k3d.localhost[]
-* link:https://quay.registry.k3d.localhost[]
+* link:https://local.registry.k3d.localhost[`https://local.registry.k3d.localhost`]
+* link:https://docker.registry.k3d.localhost[`https://docker.registry.k3d.localhos`]
+* link:https://quay.registry.k3d.localhost[`https://quay.registry.k3d.localhost`]
 
 === TLS encryption
 All endpoints are per default TLS-encrypted. For this, the `create-k3d-cluster`-script generates a self-signed certificate which is then used in conjunction with cert-manager and traefik for said TLs-encryptin. If we want, we can install the self-signed CA certificate in directory `cert-manager/certs/ca/ca.crt` in or browser and/or system.
