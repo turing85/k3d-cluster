@@ -47,15 +47,20 @@ cd -
 If `${HOME}/.local/bin` is on our `${PATH}`, then we can call the scripts (without the `.sh` extension) from everywhere.
 
 === Services
-* link:https://argoproj.github.io/cd/[ArgoCD (`argoproj.github.io`)]available at link:https://argocd.k3d.localhost[`https://argocd.k3d.localhost`]
+* link:https://argoproj.github.io/cd/[ArgoCD (`argoproj.github.io`)], available at link:https://argocd.k3d.localhost[`https://argocd.k3d.localhost`]
 * :link:https://github.com/kubernetes/dashboard[kubernetes-dashboad (`github.com`)], available at link:https://dashboard.k3d.localhost[`https://dashboard.k3d.localhos`]
 * link:https://prometheus.io/[Prometheus (`https://prometheus.io`)] and link:https://grafana.com/[Grafana (`grafana.com`)], available at link:https://prometheus.k3d.localhost[`link:https://prometheus.k3d.localhost`] and link:https://grafana.k3d.localhost[`https://grafana.k3d.localhost`] respectively
 ** The credentials for grafana are `admin`/`prom-operator`
 * link:https://doc.traefik.io/traefik/[traefik (`doc.traefik.io`)], the dashboard is available at link:https://traefik.k3d.localhost[`https://traefik.k3d.localhost`]
-* link:https://cert-manager.io/[cert-manager (`cert-manager.io`)]
+* link:https://cert-manager.io/[cert-manager (`cert-manager.io`)] for certificate-management
 * link:https://docs.portainer.io/admin/environments/add/kubernetes/agent[portainer-agent (`docs.portainer.io`)] to connect the cluster to portainer
 
-=== Image registres and mirrors
+[NOTE]
+====
+The first creation of the cluster will take a while since all images will be pulled. Subsequent cluster creations will be faster of the volume mounts for the registry and the mirrors are not deleted.
+====
+
+=== Image registry and mirrors
 To improve the startup time of the cluster and make the cluster "offline-ready", we also deploy three image registries through the container runtime environment. Two registires are mirrors for `docker.com` and `quay.io`, one local registry to which we can push our images. The local registry is available on `localhost`, port `5000`. From within the cluster, the registry can be referenced through `local.registry.localhost:5000`.
 
 For each of this registries, we also deploy a small web-ui. They are available at
@@ -63,6 +68,7 @@ For each of this registries, we also deploy a small web-ui. They are available a
 * link:https://local.registry.k3d.localhost[`https://local.registry.k3d.localhost`]
 * link:https://docker.registry.k3d.localhost[`https://docker.registry.k3d.localhos`]
 * link:https://quay.registry.k3d.localhost[`https://quay.registry.k3d.localhost`]
+* link:https://k8s-community.registry.k3d.localhost[`https://k8s-community.registry.k3d.localhost`]
 
 === TLS encryption
 All endpoints are per default TLS-encrypted. For this, the `create-k3d-cluster`-script generates a self-signed certificate which is then used in conjunction with cert-manager and traefik for said TLs-encryptin. If we want, we can install the self-signed CA certificate in directory `cert-manager/certs/ca/ca.crt` in or browser and/or system.
