@@ -110,6 +110,9 @@ docker run \
     2>"${log_dir}/docker/docker_quay_registry.err.log" \
 
 echo "starting k3s"
+kubectl config unset users.admin@k3d-local 1>/dev/null
+kubectl config unset clusters.k3d-local 1>/dev/null
+kubectl config unset contexts.k3d-local 1>/dev/null
 k3d cluster create local \
   --config ../k3d-local.yml \
   --registry-config ../k3d-registry.yml \
@@ -117,7 +120,6 @@ k3d cluster create local \
   2>"${log_dir}/k3s.err.log" \
 
 kubeconfig="${K3D_KUBECONFIG:-${HOME}/.kube/config.k3d}"
-echo "" > "${kubeconfig}"
 k3d kubeconfig merge local --output "${kubeconfig}" 1>/dev/null 2>/dev/null
 kubectl config use-context k3d-local 1>/dev/null
 

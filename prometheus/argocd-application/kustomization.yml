@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../argocd/application-templates/helm
+
+patches:
+- target:
+    group: argoproj.io
+    version: v1alpha1
+    kind: Application
+  patch: |
+    - op: replace
+      path: /metadata/name
+      value: prometheus
+    - op: add
+      path: /spec/destination/namespace
+      value: monitoring
+    - op: add
+      path: /spec/sources/-
+      value:
+        chart: prometheus-operator
+        helm:
+          releaseName: prometheus-operator
+          valueFiles:
+          - $values/prometheus/helm-values.yml
+        repoURL: https://prometheus-community.github.io/helm-charts
+        targetRevision: 55.0.0

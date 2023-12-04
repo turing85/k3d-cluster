@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../argocd/application-templates/helm
+
+patches:
+- target:
+    group: argoproj.io
+    version: v1alpha1
+    kind: Application
+  patch: |
+    - op: replace
+      path: /metadata/name
+      value: kubernetes-dashboard
+    - op: add
+      path: /spec/destination/namespace
+      value: kubernetes-dashboard
+    - op: add
+      path: /spec/sources/-
+      value:
+        chart: kubernetes-dashboard
+        helm:
+          releaseName: kubernetes-dashboard
+          valueFiles:
+          - $values/kubernetes-dashboard/helm-values.yml
+        repoURL: https://kubernetes.github.io/dashboard
+        targetRevision: 6.0.8

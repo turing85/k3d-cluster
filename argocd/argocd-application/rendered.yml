@@ -1,23 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: harbor
+  name: argocd
+  namespace: argocd
 spec:
   destination:
-    namespace: harbor
+    namespace: argocd
     server: https://kubernetes.default.svc
   project: system
   sources:
-  - chart: harbor
-    helm:
-      releaseName: harbor
-      valueFiles:
-      - $values/harbor/helm-values.yml
-    repoURL: https://helm.goharbor.io
-    targetRevision: 1.13.1
   - ref: values
     repoURL: https://github.com/turing85/k3d-cluster.git
     targetRevision: main
+  - chart: argo-cd
+    helm:
+      releaseName: argocd
+      valueFiles:
+      - $values/argocd/argocd-application/helm-values.yml
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: 5.51.5
   syncPolicy:
     automated:
       prune: true

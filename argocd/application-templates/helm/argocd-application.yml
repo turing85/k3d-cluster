@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: default-tls-crt
+  name: PLACEHOLDER
+  namespace: argocd
 spec:
   destination:
-    namespace: traefik
     server: https://kubernetes.default.svc
   project: system
-  source:
-    path: cert-manager/default-tls-crt
+  sources:
+  - ref: values
     repoURL: https://github.com/turing85/k3d-cluster.git
     targetRevision: main
   syncPolicy:

@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../application-templates/helm
+
+patches:
+- target:
+    group: argoproj.io
+    version: v1alpha1
+    kind: Application
+  patch: |
+    - op: replace
+      path: /metadata/name
+      value: argocd
+    - op: add
+      path: /spec/destination/namespace
+      value: argocd
+    - op: add
+      path: /spec/sources/-
+      value:
+        chart: argo-cd
+        helm:
+          releaseName: argocd
+          valueFiles:
+          - $values/argocd/argocd-application/helm-values.yml
+        repoURL: https://argoproj.github.io/argo-helm
+        targetRevision: 5.51.5

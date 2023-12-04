@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../argocd/application-templates/helm
+
+patches:
+- target:
+    group: argoproj.io
+    version: v1alpha1
+    kind: Application
+  patch: |
+    - op: replace
+      path: /metadata/name
+      value: harbor
+    - op: add
+      path: /spec/destination/namespace
+      value: harbor
+    - op: add
+      path: /spec/sources/-
+      value: |
+        chart: harbor
+        helm:
+          releaseName: harbor
+          valueFiles:
+          - $values/harbor/helm-values.yml
+        repoURL: https://helm.goharbor.io
+        targetRevision: 1.13.1
