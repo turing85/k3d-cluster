@@ -1917,7 +1917,6 @@ server:
     enabled: true
     # -- Additional ingress annotations
     annotations:
-      cert-manager.io/cluster-issuer: "cluster-issuer-ca"
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: 'true'
     # -- Additional ingress labels

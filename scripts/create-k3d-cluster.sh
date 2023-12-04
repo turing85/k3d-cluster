@@ -156,79 +156,20 @@ waitFor 2m \
 echo " Done!"
 
 mkdir -p "${log_dir}/argocd"
-echo "Re-installing argocd through argocd"
+echo "(Re-)installing apps through argocd"
 kubectl apply \
-  --kustomize ../argocd/argocd-project-system \
+  --kustomize ../argocd/all-argocd-applications \
   --namespace argocd \
-  1>"${log_dir}/argocd/argocd-project-system.log" \
-  2>"${log_dir}/argocd/argocd-project-system.err.log"
-kubectl apply \
-  --kustomize ../argocd/argocd-application \
-  --namespace argocd \
-  1>"${log_dir}/argocd/argocd.log" \
-  2>"${log_dir}/argocd/argocd.err.log"
-printf "Waiting for ArgoCD to become ready.."
-waitFor 2m \
-  "curl \
-    --fail \
-    --insecure \
-    --silent \
-    https://argocd.k3d.localhost"
-echo " Done!"
+  1>"${log_dir}/argocd/log.log" \
+  2>"${log_dir}/argocd/err.log"
 
-echo "Re-installing traefik through argocd"
-kubectl apply \
-  --kustomize ../traefik/argocd-application \
-  --namespace argocd \
-  1>"${log_dir}/argocd/traefik.log" \
-  2>"${log_dir}/argocd/traefik.err.log"
-
-echo "Installing cert-manager through argocd"
+printf "Installing certificates .."
 ../cert-manager/certs/build-certs.sh
-kubectl apply \
-  --kustomize ../cert-manager/argocd-application \
-  --namespace argocd \
-  1>"${log_dir}/argocd/cert-manager.log" \
-  2>"${log_dir}/argocd/cert-manager.err.log"
-printf "Deploying Certificate chain for cert-manager.."
 waitFor 2m \
   "kubectl apply \
     --kustomize ../cert-manager/certs \
     --namespace cert-manager"
 echo " Done!"
-kubectl apply \
-  --kustomize ../cert-manager/default-tls-crt/argocd-application \
-  --namespace argocd \
-  1>"${log_dir}/argocd/cert-manager.log" \
-  2>"${log_dir}/argocd/cert-manager.err.log"
-
-echo "Re-installing prometheus through argocd"
-kubectl apply \
-  --kustomize ../prometheus/argocd-application \
-  --namespace argocd \
-  1>"${log_dir}/argocd/prometheus.log" \
-  2>"${log_dir}/argocd/prometheus.err.log"
-
-echo "Installing kubernetes-dashboard through argocd"
-kubectl apply \
-  --kustomize ../kubernetes-dashboard/argocd-application \
-  --namespace argocd \
-  1>"${log_dir}/argocd/kubernetes-dashboard.log" \
-  2>"${log_dir}/argocd/kubernetes-dashboard.err.log"
-
-echo "Installing UIs for image registres through argocd"
-kubectl apply \
-  --kustomize ../registry-ui/argocd-application \
-  --namespace argocd \
-  1>"${log_dir}/argocd/registry-ui.log" \
-  2>"${log_dir}/argocd/registry-ui.err.log"
-
-echo "Installing portainer through argocd"
-kubectl apply \
-  --kustomize ../portainer/argocd-application \
-  --namespace argocd \
-  1>"${log_dir}/argocd/portainer.log" \
-  2>"${log_dir}/argocd/portainer.err.log"
 
 echo
 echo "Asserting that all deployed services are reachable"

@@ -955,7 +955,6 @@ grafana:
     ## Annotations for Grafana Ingress
     ##
     annotations:
-      cert-manager.io/cluster-issuer: "cluster-issuer-ca"
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: 'true'
 
@@ -2778,7 +2777,6 @@ prometheus:
     # ingressClassName: nginx
 
     annotations:
-      cert-manager.io/cluster-issuer: "cluster-issuer-ca"
       traefik.ingress.kubernetes.io/router.entrypoints: websecure
       traefik.ingress.kubernetes.io/router.tls: 'true'
     labels: {}

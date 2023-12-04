@@ -2,10 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ../argocd-project
+- ../argocd-project-system
 - ../argocd-application
 - ../../cert-manager/argocd-application
-- ../../cert-manager/default-tls-crt
+- ../../cert-manager/default-tls-crt/argocd-application
 - ../../kubernetes-dashboard/argocd-application
 - ../../portainer/argocd-application
 - ../../prometheus/argocd-application
