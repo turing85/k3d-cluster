@@ -29,6 +29,11 @@ The flow is as follows:
 * to start (resume) the cluste,r we call link:scripts/start-k3d-cluster.sh[`start-k3d-cluster.sh`]. This can only start clusters, that were previously created and stopped.
 * to delete a created cluster, we call link:scripts/delete-k3d-cluster.sh[`delete-k3d-cluster.sh`]. The image registries that were created are only stopped, not removed (i.e. we can still see them when running `docker ps -a`). If we subsequently create a new cluster, the same registry-containers (and volumes!) will be used, thus the images will be pulled from the mirrors, not from upstream.
 
+[NOTE]
+====
+The first creation of the cluster will take a while since all images will be pulled. Subsequent cluster creations will be faster of the volume mounts for the registry and the mirrors are not deleted.
+====
+
 The scripts are not sensitive to the location they are called from; we can call them from everywhere. For convenience, we can link them to `${HOME}/.local/bin`:
 
 .Link scripts to `${HOME}/.local/bin`
@@ -54,11 +59,6 @@ If `${HOME}/.local/bin` is on our `${PATH}`, then we can call the scripts (witho
 * link:https://doc.traefik.io/traefik/[traefik (`doc.traefik.io`)], the dashboard is available at link:https://traefik.k3d.localhost[`https://traefik.k3d.localhost`]
 * link:https://cert-manager.io/[cert-manager (`cert-manager.io`)] for certificate-management
 * link:https://docs.portainer.io/admin/environments/add/kubernetes/agent[portainer-agent (`docs.portainer.io`)] to connect the cluster to portainer
-
-[NOTE]
-====
-The first creation of the cluster will take a while since all images will be pulled. Subsequent cluster creations will be faster of the volume mounts for the registry and the mirrors are not deleted.
-====
 
 === Image registry and mirrors
 To improve the startup time of the cluster and make the cluster "offline-ready", we also deploy three image registries through the container runtime environment. Two registires are mirrors for `docker.com` and `quay.io`, one local registry to which we can push our images. The local registry is available on `localhost`, port `5000`. From within the cluster, the registry can be referenced through `local.registry.localhost:5000`.
