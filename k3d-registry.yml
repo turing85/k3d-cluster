@@ -1,4 +1,8 @@
 mirrors:
+  local.registry.localhost:5000:
+    endpoint:
+    - "http://local.registry.localhost:5000"
+
   docker.io:
     endpoint:
     - "http://docker.mirror.registry.localhost:5000"
