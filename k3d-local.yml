@@ -38,6 +38,4 @@ options:
       hard: 65535
 registries:
   use:
-  - local.registry.localhost:5000
   - docker.mirror.registry.localhost:5000
-  - quay.mirror.registry.localhost:5000
