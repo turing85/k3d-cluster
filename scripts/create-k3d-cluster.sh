@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-function waitFor() {
+function wait_for() {
   timeout \
     --foreground \
     --kill-after "${1}" \
@@ -15,7 +15,7 @@ function waitFor() {
       done"
 }
 
-function createRegistry() {
+function create_registry() {
   local name="${1}"
   local host_port="${2}"
   local k3d_version="{3}"
@@ -48,7 +48,7 @@ function createRegistry() {
       2>"${log_dir}/docker/${name//./_}.err.log"
 }
 
-function createRegistryMirror() {
+function create_registry_mirror() {
   local name="${1}"
   local host_port="${2}"
   local registry_to_mirror="${3}"
@@ -87,22 +87,20 @@ log_dir="../logs"
 mkdir -p "${log_dir}"
 rm -rf "${log_dir:?}/"
 
-k3d_version="$(k3d --version | head -n 1 | sed 's|k3d version v\(.*\)$*|\1|g')"
-
 kubectl config unset users.admin@k3d-local 1>/dev/null
 kubectl config unset clusters.k3d-local 1>/dev/null
 kubectl config unset contexts.k3d-local 1>/dev/null
+
+k3d_version="$(k3d --version | head -n 1 | sed 's|k3d version v\(.*\)$*|\1|g')"
 mkdir -p "${log_dir}/docker"
-
 echo "starting local registry"
-createRegistry local.registry.localhost 5000 "${k3d_version}" "${log_dir}"
-
+create_registry local.registry.localhost 5000 "${k3d_version}" "${log_dir}"
 echo "starting docker registry mirror"
-createRegistryMirror docker.mirror.registry.localhost 5001 https://registry-1.docker.io "${k3d_version}" "${log_dir}"
+create_registry_mirror docker.mirror.registry.localhost 5001 https://registry-1.docker.io "${k3d_version}" "${log_dir}"
 echo "starting quay registry mirror"
-createRegistryMirror quay.mirror.registry.localhost 5002 https://quay.io "${k3d_version}" "${log_dir}"
+create_registry_mirror quay.mirror.registry.localhost 5002 https://quay.io "${k3d_version}" "${log_dir}"
 echo "starting k8s community registry mirror"
-createRegistryMirror k8s-community.mirror.registry.localhost 5003 https://registry.k8s.io "${k3d_version}" "${log_dir}"
+create_registry_mirror k8s-community.mirror.registry.localhost 5003 https://registry.k8s.io "${k3d_version}" "${log_dir}"
 
 echo "starting k3s"
 kubectl config unset users.admin@k3d-local 1>/dev/null
@@ -142,7 +140,7 @@ helm install \
   2>"${log_dir}/helm/traefik.err.log"
 
 printf "Waiting for ArgoCD to become ready.."
-waitFor 5m \
+wait_for 5m \
   "curl \
     --fail \
     --insecure \
@@ -158,9 +156,9 @@ kubectl apply \
   1>"${log_dir}/argocd/log.log" \
   2>"${log_dir}/argocd/err.log"
 
-printf "Installing certificates .."
+printf "Installing certificates.."
 ../cert-manager/certs/build-certs.sh
-waitFor 5m \
+wait_for 5m \
   "kubectl apply \
     --kustomize ../cert-manager/certs \
     --namespace cert-manager"
@@ -181,7 +179,7 @@ urls=( \
 for url in "${urls[@]}"
 do
   printf "Waiting for %s to becomen reachable.." "${url}"
-  waitFor 5m \
+  wait_for 5m \
     "curl \
       --cacert ../cert-manager/certs/ca/ca.crt \
       --fail \
@@ -202,6 +200,7 @@ echo "    https://traefik.k3d.localhost"
 echo "    https://local.registry.k3d.localhost"
 echo "    https://docker.registry.k3d.localhost (dockerhub mirror)"
 echo "    https://quay.registry.k3d.localhost (quay.io mirror)"
+echo "    https://k8s-community.registry.k3d.localhost (quay.io mirror)"
 echo
 echo "The system  provides a registry at"
 echo "    local.registry.localhost:5000"
