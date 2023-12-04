@@ -4,5 +4,6 @@ set -e
 docker start local.registry.localhost || true
 docker start docker.mirror.registry.localhost || true
 docker start quay.mirror.registry.localhost || true
+docker start k8s-community.mirror.registry.localhost || true
 
 k3d cluster start local || true

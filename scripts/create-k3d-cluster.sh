@@ -15,6 +15,73 @@ function waitFor() {
       done"
 }
 
+function createRegistry() {
+  local name="${1}"
+  local host_port="${2}"
+  local k3d_version="{3}"
+  local log_dir="${4}"
+  docker run \
+    --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
+    --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods='["*"]' \
+    --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin='["*"]' \
+    --env REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers='[Docker-Content-Digest]' \
+    --env REGISTRY_STORAGE_DELETE_ENABLED=true \
+    --name "${name}" \
+    --network k3d-local \
+    --publish "${host_port}":5000 \
+    --volume ${name//./_}:/var/lib/registry \
+    --label app=k3d \
+    --label k3d.cluster	\
+    --label k3d.registry.host	\
+    --label k3d.registry.hostIP=0.0.0.0 \
+    --label k3d.role=registry \
+    --label k3d.version="${k3d_version}" \
+    --label k3s.registry.port.external=5000 \
+    --label k3s.registry.port.internal=5000 \
+    --restart=unless-stopped \
+    --detach \
+    docker.io/library/registry:2.8.2 \
+    1>"${log_dir}/docker/${name//./_}.log" \
+    2>"${log_dir}/docker/${name//./_}.err.log" \
+    || docker start ${name} \
+      1>"${log_dir}/docker/${name//./_}.log" \
+      2>"${log_dir}/docker/${name//./_}.err.log"
+}
+
+function createRegistryMirror() {
+  local name="${1}"
+  local host_port="${2}"
+  local registry_to_mirror="${3}"
+  local k3d_version="{4}"
+  local log_dir="${5}"
+  docker run \
+    --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
+    --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods='["*"]' \
+    --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin='["*"]' \
+    --env REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers='[Docker-Content-Digest]' \
+    --env "REGISTRY_PROXY_REMOTEURL=${registry_to_mirror}" \
+    --name "${name}" \
+    --network k3d-local \
+    --publish "${host_port}":5000 \
+    --volume ${name//./_}:/var/lib/registry \
+    --label app=k3d \
+    --label k3d.cluster	\
+    --label k3d.registry.host	\
+    --label k3d.registry.hostIP=0.0.0.0 \
+    --label k3d.role=registry \
+    --label k3d.version="${k3d_version}" \
+    --label k3s.registry.port.external=5000 \
+    --label k3s.registry.port.internal=5000 \
+    --restart=unless-stopped \
+    --detach \
+    docker.io/library/registry:2.8.2 \
+    1>"${log_dir}/docker/${name//./_}.log" \
+    2>"${log_dir}/docker/${name//./_}.err.log" \
+    || docker start ${name} \
+      1>"${log_dir}/docker/${name//./_}.log" \
+      2>"${log_dir}/docker/${name//./_}.err.log"
+}
+
 cd -- "$(dirname "$(readlink -f "$0")")" &> /dev/null
 log_dir="../logs"
 mkdir -p "${log_dir}"
@@ -22,92 +89,20 @@ rm -rf "${log_dir:?}/"
 
 k3d_version="$(k3d --version | head -n 1 | sed 's|k3d version v\(.*\)$*|\1|g')"
 
-mkdir -p "${log_dir}/docker"
 kubectl config unset users.admin@k3d-local 1>/dev/null
 kubectl config unset clusters.k3d-local 1>/dev/null
 kubectl config unset contexts.k3d-local 1>/dev/null
-docker run \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods='["*"]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin='["*"]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers='[Docker-Content-Digest]' \
-  --env REGISTRY_STORAGE_DELETE_ENABLED=true \
-  --name local.registry.localhost \
-  --network k3d-local \
-  --publish 5000:5000 \
-  --volume local-registry:/var/lib/registry \
-  --label app=k3d \
-  --label k3d.cluster	\
-  --label k3d.registry.host	\
-  --label k3d.registry.hostIP=0.0.0.0 \
-  --label k3d.role=registry \
-  --label k3d.version="${k3d_version}" \
-  --label k3s.registry.port.external=5000 \
-  --label k3s.registry.port.internal=5000 \
-  --restart=unless-stopped \
-  --detach \
-  docker.io/library/registry:2.8.2 \
-  1>"${log_dir}/docker/local_registry.log" \
-  2>"${log_dir}/docker/local_registry.err.log" \
-  || docker start local.registry.localhost \
-    1>"${log_dir}/docker/local_registry.log" \
-    2>"${log_dir}/docker/local_registry.err.log"
+mkdir -p "${log_dir}/docker"
+
+echo "starting local registry"
+createRegistry local.registry.localhost 5000 "${k3d_version}" "${log_dir}"
 
 echo "starting docker registry mirror"
-docker run \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods='["*"]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin='["*"]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers='[Docker-Content-Digest]' \
-  --env REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io \
-  --name docker.mirror.registry.localhost \
-  --network k3d-local \
-  --publish 5001:5000 \
-  --volume docker-mirror-registry:/var/lib/registry \
-  --label app=k3d \
-  --label k3d.cluster	\
-  --label k3d.registry.host	\
-  --label k3d.registry.hostIP=0.0.0.0 \
-  --label k3d.role=registry \
-  --label k3d.version="${k3d_version}" \
-  --label k3s.registry.port.external=5000 \
-  --label k3s.registry.port.internal=5000 \
-  --restart=unless-stopped \
-  --detach \
-  docker.io/library/registry:2.8.2 \
-  1>"${log_dir}/docker/docker_registry_mirror.log" \
-  2>"${log_dir}/docker/docker_registry_mirror.err.log" \
-  || docker start docker.mirror.registry.localhost \
-    1>"${log_dir}/docker/docker_registry_mirror.log" \
-    2>"${log_dir}/docker/docker_registry_mirror.err.log" \
-
+createRegistryMirror docker.mirror.registry.localhost 5001 https://registry-1.docker.io "${k3d_version}" "${log_dir}"
 echo "starting quay registry mirror"
-docker run \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods='["*"]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin='["*"]' \
-  --env REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers='[Docker-Content-Digest]' \
-  --env REGISTRY_PROXY_REMOTEURL=https://quay.io \
-  --name quay.mirror.registry.localhost \
-  --network k3d-local \
-  --publish 5002:5000 \
-  --volume quay-mirror-registry:/var/lib/registry \
-  --label app=k3d \
-  --label k3d.cluster	\
-  --label k3d.registry.host	\
-  --label k3d.registry.hostIP=0.0.0.0 \
-  --label k3d.role=registry \
-  --label k3d.version="${k3d_version}" \
-  --label k3s.registry.port.external=5000 \
-  --label k3s.registry.port.internal=5000 \
-  --restart=unless-stopped \
-  --detach \
-  docker.io/library/registry:2.8.2 \
-  1>"${log_dir}/docker/quay_registry_mirror.log" \
-  2>"${log_dir}/docker/quay_registry_mirror.err.log" \
-  || docker start quay.mirror.registry.localhost \
-    1>"${log_dir}/docker/quay_registry_mirror.log" \
-    2>"${log_dir}/docker/quay_registry_mirror.err.log" \
+createRegistryMirror quay.mirror.registry.localhost 5002 https://quay.io "${k3d_version}" "${log_dir}"
+echo "starting k8s community registry mirror"
+createRegistryMirror k8s-community.mirror.registry.localhost 5003 https://registry.k8s.io "${k3d_version}" "${log_dir}"
 
 echo "starting k3s"
 kubectl config unset users.admin@k3d-local 1>/dev/null
@@ -147,7 +142,7 @@ helm install \
   2>"${log_dir}/helm/traefik.err.log"
 
 printf "Waiting for ArgoCD to become ready.."
-waitFor 2m \
+waitFor 5m \
   "curl \
     --fail \
     --insecure \
@@ -165,7 +160,7 @@ kubectl apply \
 
 printf "Installing certificates .."
 ../cert-manager/certs/build-certs.sh
-waitFor 2m \
+waitFor 5m \
   "kubectl apply \
     --kustomize ../cert-manager/certs \
     --namespace cert-manager"
@@ -186,7 +181,7 @@ urls=( \
 for url in "${urls[@]}"
 do
   printf "Waiting for %s to becomen reachable.." "${url}"
-  waitFor 2m \
+  waitFor 5m \
     "curl \
       --cacert ../cert-manager/certs/ca/ca.crt \
       --fail \
