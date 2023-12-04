@@ -7,12 +7,12 @@ There are some prerequisistes necessary to run this project:
 
 * DNS names of the form `.*k3d.localhost` must resolve to `localhost` (i.e. `127.0.0.1`)
 * Software installed:
-** `docker`, or a container runtime that is compatible with docker (and has an alias to the `docker` command), e.g. podman
-** `kubectl` cli
-** `helm` cli
-** `k3d` cli
-** `curl`
-** `openssl`
+** link:https://www.docker.com/[`docker` (`www.docker.com`)], or a container runtime that is compatible with docker (and has an alias to the `docker` command), e.g. link:https://podman.io/[`podman` (`podman.io`)]
+** link:https://kubernetes.io/docs/reference/kubectl/[`kubectl` cli(`kubernetes.io`)]
+** link:https://helm.sh/[`helm` cli (`helm.sh`)]
+** link:https://k3d.io/[`k3d` cli (`k3d.io`)]
+** link:https://curl.se/[`curl` (`curl.se`)]
+** link:https://www.openssl.org/[`openssl` (`www.openssl.org`)]
 * An internet connection
 
 == What is provided?
