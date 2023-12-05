@@ -53,7 +53,7 @@ If `${HOME}/.local/bin` is on our `${PATH}`, then we can call the scripts (witho
 
 === Services
 * link:https://argoproj.github.io/cd/[ArgoCD (`argoproj.github.io`)], available at link:https://argocd.k3d.localhost[`https://argocd.k3d.localhost`]
-* :link:https://github.com/kubernetes/dashboard[kubernetes-dashboad (`github.com`)], available at link:https://dashboard.k3d.localhost[`https://dashboard.k3d.localhos`]
+* link:https://github.com/kubernetes/dashboard[kubernetes-dashboad (`github.com`)], available at link:https://dashboard.k3d.localhost[`https://dashboard.k3d.localhos`]
 * link:https://prometheus.io/[Prometheus (`https://prometheus.io`)] and link:https://grafana.com/[Grafana (`grafana.com`)], available at link:https://prometheus.k3d.localhost[`link:https://prometheus.k3d.localhost`] and link:https://grafana.k3d.localhost[`https://grafana.k3d.localhost`] respectively
 ** The credentials for grafana are `admin`/`prom-operator`
 * link:https://doc.traefik.io/traefik/[traefik (`doc.traefik.io`)], the dashboard is available at link:https://traefik.k3d.localhost[`https://traefik.k3d.localhost`]
