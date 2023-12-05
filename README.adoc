@@ -61,7 +61,7 @@ If `${HOME}/.local/bin` is on our `${PATH}`, then we can call the scripts (witho
 * link:https://docs.portainer.io/admin/environments/add/kubernetes/agent[portainer-agent (`docs.portainer.io`)] to connect the cluster to portainer
 
 === Image registry and mirrors
-To improve the startup time of the cluster and make the cluster "offline-ready", we also deploy three image registries through the container runtime environment. Two registires are mirrors for `docker.com` and `quay.io`, one local registry to which we can push our images. The local registry is available on `localhost`, port `5000`. From within the cluster, the registry can be referenced through `local.registry.localhost:5000`.
+To improve the startup time of the cluster and make the cluster "offline-ready", we also deploy for image registries through the container runtime environment. Three registires are mirrors for `docker.com`, `quay.io`, and registry.k8s.io, one local registry to which we can push our images. The local registry is available on `localhost`, port `5000`. From within the cluster, the registry can be referenced through `local.registry.localhost:5000`.
 
 For each of this registries, we also deploy a small web-ui. They are available at
 
