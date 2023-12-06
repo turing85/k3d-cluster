@@ -25,8 +25,8 @@ The connection-config to the cluster is written to the config-file in environmen
 The flow is as follows:
 
 * to create a cluster, we call link:scripts/create-k3d-cluster.sh[`create-k3d-cluster.sh`]
-* to stop (suspend) the cluste,r we call link:scripts/stop-k3d-cluster.sh[`stop-k3d-cluster.sh`]. This will not delete anything.
-* to start (resume) the cluste,r we call link:scripts/start-k3d-cluster.sh[`start-k3d-cluster.sh`]. This can only start clusters, that were previously created and stopped.
+* to stop (suspend) the cluster, we call link:scripts/stop-k3d-cluster.sh[`stop-k3d-cluster.sh`]. This will not delete anything.
+* to start (resume) the cluster, we call link:scripts/start-k3d-cluster.sh[`start-k3d-cluster.sh`]. This can only start clusters, that were previously created and stopped.
 * to delete a created cluster, we call link:scripts/delete-k3d-cluster.sh[`delete-k3d-cluster.sh`]. The image registries that were created are only stopped, not removed (i.e. we can still see them when running `docker ps -a`). If we subsequently create a new cluster, the same registry-containers (and volumes!) will be used, thus the images will be pulled from the mirrors, not from upstream.
 
 [NOTE]
