@@ -175,6 +175,7 @@ urls=( \
   "https://local.registry.k3d.localhost" \
   "https://docker.registry.k3d.localhost" \
   "https://quay.registry.k3d.localhost" \
+  "https://k8s-community.registry.k3d.localhost" \
 )
 for url in "${urls[@]}"
 do
@@ -200,7 +201,7 @@ echo "    https://traefik.k3d.localhost"
 echo "    https://local.registry.k3d.localhost"
 echo "    https://docker.registry.k3d.localhost (dockerhub mirror)"
 echo "    https://quay.registry.k3d.localhost (quay.io mirror)"
-echo "    https://k8s-community.registry.k3d.localhost (quay.io mirror)"
+echo "    https://k8s-community.registry.k3d.localhost (k8s-community registry mirror)"
 echo
 echo "The system  provides a registry at"
 echo "    local.registry.localhost:5000"
