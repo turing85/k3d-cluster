@@ -30,7 +30,9 @@ then
       -out ca/ca.crt
   fi
   # generate key for inter ca
-  openssl genrsa -out inter/inter.key 4096
+  openssl genrsa \
+    -out inter/inter.key \
+    4096
 
   # generate certificate sing request for inter ca
   openssl req \
