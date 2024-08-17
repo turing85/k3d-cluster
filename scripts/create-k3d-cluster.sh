@@ -122,6 +122,7 @@ helm repo add argocd https://argoproj.github.io/argo-helm 1>/dev/null \
   || helm repo update argo-cd 1>/dev/null
 helm install \
   argocd argo-cd/argo-cd \
+  --version 7.4.4 \
   --values ../argocd/helm-values.yml \
   --namespace argocd \
   --create-namespace \
@@ -133,6 +134,7 @@ helm repo add traefik https://traefik.github.io/charts 1>/dev/null || \
   helm repo update traefik 1>/dev/null
 helm install \
   traefik traefik/traefik \
+  --version 30.1.0 \
   --values ../traefik/helm-values.yml \
   --namespace traefik \
   --create-namespace \

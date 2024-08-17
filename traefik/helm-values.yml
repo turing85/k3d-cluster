@@ -143,9 +143,9 @@ gateway:
     web:
       # -- Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules.
       # The port must match a port declared in ports section.
-      port: 8000
+      port: 80
       # -- Optional hostname. See [Hostname](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.Hostname)
-      hostname:
+      hostname: '*.k3dlocalhost'
       # Specify expected protocol on this listener. See [ProtocolType](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ProtocolType)
       protocol: HTTP
       # -- Routes are restricted to namespace of the gateway [by default](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.FromNamespaces
@@ -169,7 +169,7 @@ gateway:
 
 gatewayClass:
   # -- When providers.kubernetesGateway.enabled and gateway.enabled, deploy a default gatewayClass
-  enabled: true
+  enabled: false
   # -- Set a custom name to GatewayClass
   name:
   # -- Additional gatewayClass labels (e.g. for filtering gateway objects by custom labels)
@@ -564,7 +564,8 @@ globalArguments:
 # -- Additional arguments to be passed at Traefik's binary
 # See [CLI Reference](https://docs.traefik.io/reference/static-configuration/cli/)
 # Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
-additionalArguments: []
+additionalArguments:
+- "--api.insecure=true"
 #  - "--providers.kubernetesingress.ingressclass=traefik-internal"
 #  - "--log.level=DEBUG"
 
@@ -922,25 +923,25 @@ extraObjects:
 - apiVersion: networking.k8s.io/v1
   kind: Ingress
   metadata:
-    name: traefik-dashboard
-    annotations:
-      traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      traefik.ingress.kubernetes.io/router.tls: 'true'
+   name: traefik-dashboard
+   annotations:
+     traefik.ingress.kubernetes.io/router.entrypoints: websecure
+     traefik.ingress.kubernetes.io/router.tls: 'true'
   spec:
-    rules:
-    - host: traefik.k3d.localhost
-      http:
-        paths:
-        - backend:
-            service:
-              name: traefik
-              port:
-                name: traefik
-          path: /
-          pathType: Prefix
-    tls:
-    - hosts:
-      - traefik.k3d.localhost
+   rules:
+   - host: traefik.k3d.localhost
+     http:
+       paths:
+       - backend:
+           service:
+             name: traefik
+             port:
+               name: traefik
+         path: /
+         pathType: Prefix
+   tls:
+   - hosts:
+     - traefik.k3d.localhost
 
 # -- This field override the default Release Namespace for Helm.
 # It will not affect optional CRDs such as `ServiceMonitor` and `PrometheusRules`

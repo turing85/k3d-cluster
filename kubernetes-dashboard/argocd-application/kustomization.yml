@@ -25,4 +25,4 @@ patches:
           valueFiles:
           - $values/kubernetes-dashboard/helm-values.yml
         repoURL: https://kubernetes.github.io/dashboard
-        targetRevision: 7.5.0
+        targetRevision: 6.0.8
