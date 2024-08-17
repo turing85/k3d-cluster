@@ -25,4 +25,4 @@ patches:
           valueFiles:
           - $values/cert-manager/helm-values.yml
         repoURL: https://charts.jetstack.io
-        targetRevision: 1.13.2
+        targetRevision: 1.15.3

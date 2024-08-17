@@ -25,4 +25,4 @@ patches:
           valueFiles:
           - $values/argocd/helm-values.yml
         repoURL: https://argoproj.github.io/argo-helm
-        targetRevision: 5.51.5
+        targetRevision: 7.4.4

@@ -25,4 +25,4 @@ patches:
           valueFiles:
           - $values/traefik/helm-values.yml
         repoURL: https://traefik.github.io/charts
-        targetRevision: 25.0.0
+        targetRevision: 30.1.0

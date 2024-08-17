@@ -25,4 +25,4 @@ patches:
           valueFiles:
           - $values/harbor/helm-values.yml
         repoURL: https://helm.goharbor.io
-        targetRevision: 1.13.1
+        targetRevision: 1.15.0
