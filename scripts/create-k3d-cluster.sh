@@ -29,7 +29,7 @@ function create_registry() {
     --name "${name}" \
     --network k3d-local \
     --publish "${host_port}":5000 \
-    --volume ${name//./_}:/var/lib/registry \
+    --volume "${name//./_}":/var/lib/registry \
     --label app=k3d \
     --label k3d.cluster	\
     --label k3d.registry.host	\
@@ -43,7 +43,7 @@ function create_registry() {
     docker.io/library/registry:2.8.2 \
     1>"${log_dir}/docker/${name//./_}.log" \
     2>"${log_dir}/docker/${name//./_}.err.log" \
-    || docker start ${name} \
+    || docker start "${name}" \
       1>"${log_dir}/docker/${name//./_}.log" \
       2>"${log_dir}/docker/${name//./_}.err.log"
 }
@@ -59,11 +59,11 @@ function create_registry_mirror() {
     --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods='["*"]' \
     --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin='["*"]' \
     --env REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers='[Docker-Content-Digest]' \
-    --env "REGISTRY_PROXY_REMOTEURL=${registry_to_mirror}" \
+    --env REGISTRY_PROXY_REMOTEURL="${registry_to_mirror}" \
     --name "${name}" \
     --network k3d-local \
     --publish "${host_port}":5000 \
-    --volume ${name//./_}:/var/lib/registry \
+    --volume "${name//./_}":/var/lib/registry \
     --label app=k3d \
     --label k3d.cluster	\
     --label k3d.registry.host	\
@@ -77,7 +77,7 @@ function create_registry_mirror() {
     docker.io/library/registry:2.8.2 \
     1>"${log_dir}/docker/${name//./_}.log" \
     2>"${log_dir}/docker/${name//./_}.err.log" \
-    || docker start ${name} \
+    || docker start "${name}" \
       1>"${log_dir}/docker/${name//./_}.log" \
       2>"${log_dir}/docker/${name//./_}.err.log"
 }
@@ -237,7 +237,7 @@ urls=( \
 )
 for url in "${urls[@]}"
 do
-  printf "Waiting for %s to becomen reachable.." "${url}"
+  printf "Waiting for %s to become reachable.." "${url}"
   wait_for 5m \
     "curl \
       --cacert ../cert-manager/certs/ca/ca.crt \
@@ -261,7 +261,7 @@ echo "    https://docker.registry.k3d.localhost (dockerhub mirror)"
 echo "    https://quay.registry.k3d.localhost (quay.io mirror)"
 echo "    https://k8s-community.registry.k3d.localhost (k8s-community registry mirror)"
 echo
-echo "The system  provides a registry at"
+echo "The system provides a registry at"
 echo "    local.registry.localhost:5000"
 echo
 echo "If you want to deploy custom images, push them into this registry."
