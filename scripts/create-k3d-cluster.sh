@@ -151,6 +151,30 @@ wait_for 5m \
 echo " Done!"
 
 mkdir -p "${log_dir}/argocd"
+
+echo "Reinstalling argocd through argocd"
+kubectl apply \
+  --kustomize ../argocd/argocd-application \
+  --namespace argocd \
+  1>"${log_dir}/argocd/log.log" \
+  2>"${log_dir}/argocd/err.log"
+
+echo "Reinstalling traefik through argocd"
+kubectl apply \
+  --kustomize ../traefik/argocd-application \
+  --namespace argocd \
+  1>"${log_dir}/argocd/log.log" \
+  2>"${log_dir}/argocd/err.log"
+
+printf "Waiting for ArgoCD to become ready.."
+wait_for 5m \
+  "curl \
+    --fail \
+    --insecure \
+    --silent \
+    https://argocd.k3d.localhost"
+echo " Done!"
+
 echo "(Re-)installing apps through argocd"
 kubectl apply \
   --kustomize ../argocd/all-argocd-applications \
