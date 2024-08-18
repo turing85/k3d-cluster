@@ -185,6 +185,13 @@ wait_for 5m \
     --namespace cert-manager"
 echo " Done!"
 
+printf "Creating ArgoCD meta-project holding all applications.."
+wait_for 5m \
+  "kubectl apply \
+    --kustomize ../argocd/argocd-all-argocd-applications \
+    --namespace argocd"
+echo " Done!"
+
 echo
 echo "Asserting that all deployed services are reachable"
 urls=( \

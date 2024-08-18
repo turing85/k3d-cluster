@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../application-templates/kustomize
+- ../../cert-manager/certs
+
+patches:
+- target:
+    group: argoproj.io
+    version: v1alpha1
+    kind: Application
+  patch: |
+    - op: replace
+      path: /metadata/name
+      value: all-argocd-applications
+    - op: add
+      path: /spec/destination/namespace
+      value: argocd
+    - op: add
+      path: /spec/source/path
+      value: argocd/all-argocd-applications/
