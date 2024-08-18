@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: kubernetes-dashboard-add-auth-header
+spec:
+  headers:
+    accessControlAllowCredentials: true
+    accessControlAllowHeaders:
+      - '*'
+    customRequestHeaders:
+      Authorization: Bearer TOKEN

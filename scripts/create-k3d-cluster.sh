@@ -158,6 +158,25 @@ kubectl apply \
   1>"${log_dir}/argocd/log.log" \
   2>"${log_dir}/argocd/err.log"
 
+printf "Waiting for serviceaccount 'admin' in namespace 'kubernetes-dashboard' to exist.."
+wait_for 5m \
+  "kubectl get sa/admin \
+    --namespace kubernetes-dashboard \
+    1> /dev/null 2> /dev/null"
+echo " Done!"
+printf "Adding middleware with bearer token for kubernetes-dashboard..."
+token=$(kubectl \
+  --namespace kubernetes-dashboard \
+  --duration=999999h \
+  create token admin)
+sed 's/TOKEN/'"${token}"'/g' ../kubernetes-dashboard/templates/middleware.yml \
+  | 1> /dev/null \
+    kubectl apply \
+      --namespace kubernetes-dashboard \
+      --filename -
+unset token
+echo " Done!"
+
 printf "Installing certificates.."
 ../cert-manager/certs/build-certs.sh
 wait_for 5m \
