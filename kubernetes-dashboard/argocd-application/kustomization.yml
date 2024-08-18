@@ -26,3 +26,10 @@ patches:
           - $values/kubernetes-dashboard/helm-values.yml
         repoURL: https://kubernetes.github.io/dashboard
         targetRevision: 7.5.0
+    - op: add
+      path: /spec/ignoreDifferences
+      value:
+        - group: apps
+          kind: Deployment
+          jqPathExpressions:
+          - .spec.template.spec.containers[0].env[] | select(.name == "GOMAXPROCS" or .name == "GOMEMLIMIT") | .valueFrom.resourceFieldRef.divisor
