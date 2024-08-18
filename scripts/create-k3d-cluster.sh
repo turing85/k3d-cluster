@@ -179,15 +179,6 @@ kubectl apply \
   2>"${log_dir}/argocd/err.log"
 echo " Done!"
 
-printf "Waiting for ArgoCD to become ready.."
-wait_for 5m \
-  "curl \
-    --fail \
-    --insecure \
-    --silent \
-    https://argocd.k3d.localhost"
-echo " Done!"
-
 printf "(Re-)installing apps through argocd..."
 kubectl apply \
   --kustomize ../argocd/all-argocd-applications \
