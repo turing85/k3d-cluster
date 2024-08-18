@@ -432,7 +432,7 @@ extras:
         annotations:
           meta.helm.sh/release-name: kubernetes-dashboard
           meta.helm.sh/release-namespace: kubernetes-dashboard
-          traefik.ingress.kubernetes.io/service.serverstransport: kubernetes-dashboard-kubernetes-dashboard-transport@kubernetescrd
+          traefik.ingress.kubernetes.io/service.serverstransport: kubernetes-dashboard-transport-kong-proxy-for-ingress@kubernetescrd
         name: kubernetes-dashboard-kong-proxy-for-ingress
         namespace: kubernetes-dashboard
       spec:
