@@ -13,6 +13,7 @@ There are some prerequisistes necessary to run this project:
 ** https://k3d.io/[`k3d` cli (`k3d.io`)]
 ** https://curl.se/[`curl` (`curl.se`)]
 ** https://www.openssl.org/[`openssl` (`www.openssl.org`)]
+** https://www.gnu.org/software/sed/manual/sed.html[`sed` (`www.gnu.org`)]
 * An internet connection
 
 == What is provided?
