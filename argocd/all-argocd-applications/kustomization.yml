@@ -7,7 +7,6 @@ resources:
 - ../../cert-manager/argocd-application
 - ../../cert-manager/default-tls-crt/argocd-application
 - ../../kubernetes-dashboard/argocd-application
-- ../../portainer/argocd-application
 - ../../prometheus/argocd-application
 - ../../registry-ui/argocd-application
 - ../../traefik/argocd-application
