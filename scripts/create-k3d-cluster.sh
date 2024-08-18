@@ -93,16 +93,24 @@ kubectl config unset contexts.k3d-local 1>/dev/null
 
 k3d_version="$(k3d --version | head -n 1 | sed 's|k3d version v\(.*\)$*|\1|g')"
 mkdir -p "${log_dir}/docker"
-echo "starting local registry"
-create_registry local.registry.localhost 5000 "${k3d_version}" "${log_dir}"
-echo "starting docker registry mirror"
-create_registry_mirror docker.mirror.registry.localhost 5001 https://registry-1.docker.io "${k3d_version}" "${log_dir}"
-echo "starting quay registry mirror"
-create_registry_mirror quay.mirror.registry.localhost 5002 https://quay.io "${k3d_version}" "${log_dir}"
-echo "starting k8s community registry mirror"
-create_registry_mirror k8s-community.mirror.registry.localhost 5003 https://registry.k8s.io "${k3d_version}" "${log_dir}"
 
-echo "starting k3s"
+printf "starting local registry..."
+create_registry local.registry.localhost 5000 "${k3d_version}" "${log_dir}"
+echo " Done!"
+
+printf "starting docker registry mirror..."
+create_registry_mirror docker.mirror.registry.localhost 5001 https://registry-1.docker.io "${k3d_version}" "${log_dir}"
+echo " Done!"
+
+printf "starting quay registry mirror..."
+create_registry_mirror quay.mirror.registry.localhost 5002 https://quay.io "${k3d_version}" "${log_dir}"
+echo " Done!"
+
+printf "starting k8s community registry mirror..."
+create_registry_mirror k8s-community.mirror.registry.localhost 5003 https://registry.k8s.io "${k3d_version}" "${log_dir}"
+echo " Done!"
+
+printf "starting k3s..."
 kubectl config unset users.admin@k3d-local 1>/dev/null
 kubectl config unset clusters.k3d-local 1>/dev/null
 kubectl config unset contexts.k3d-local 1>/dev/null
@@ -110,14 +118,15 @@ k3d cluster create local \
   --config ../k3d-local.yml \
   --registry-config ../k3d-registry.yml \
   1>"${log_dir}/k3s.log" \
-  2>"${log_dir}/k3s.err.log" \
+  2>"${log_dir}/k3s.err.log"
+echo " Done!"
 
 kubeconfig="${K3D_KUBECONFIG:-${HOME}/.kube/config.k3d}"
 k3d kubeconfig merge local --output "${kubeconfig}" 1>/dev/null 2>/dev/null
 kubectl config use-context k3d-local 1>/dev/null
 
 mkdir -p "${log_dir}/helm"
-echo "Installing argocd through helm"
+printf "Installing argocd through helm..."
 helm repo add argocd https://argoproj.github.io/argo-helm 1>/dev/null \
   || helm repo update argo-cd 1>/dev/null
 helm install \
@@ -128,8 +137,9 @@ helm install \
   --create-namespace \
   1>"${log_dir}/helm/argocd.log" \
   2>"${log_dir}/helm/argocd.err.log"
+echo " Done!"
 
-echo "Installing traefik through helm"
+printf "Installing traefik through helm..."
 helm repo add traefik https://traefik.github.io/charts 1>/dev/null || \
   helm repo update traefik 1>/dev/null
 helm install \
@@ -140,6 +150,7 @@ helm install \
   --create-namespace \
   1>"${log_dir}/helm/traefik.log" \
   2>"${log_dir}/helm/traefik.err.log"
+echo " Done!"
 
 printf "Waiting for ArgoCD to become ready.."
 wait_for 5m \
@@ -152,19 +163,21 @@ echo " Done!"
 
 mkdir -p "${log_dir}/argocd"
 
-echo "Reinstalling argocd through argocd"
+printf "Reinstalling argocd through argocd..."
 kubectl apply \
   --kustomize ../argocd/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/log.log" \
   2>"${log_dir}/argocd/err.log"
+echo " Done!"
 
-echo "Reinstalling traefik through argocd"
+printf "Reinstalling traefik through argocd..."
 kubectl apply \
   --kustomize ../traefik/argocd-application \
   --namespace argocd \
   1>"${log_dir}/argocd/log.log" \
   2>"${log_dir}/argocd/err.log"
+echo " Done!"
 
 printf "Waiting for ArgoCD to become ready.."
 wait_for 5m \
@@ -175,12 +188,13 @@ wait_for 5m \
     https://argocd.k3d.localhost"
 echo " Done!"
 
-echo "(Re-)installing apps through argocd"
+printf "(Re-)installing apps through argocd..."
 kubectl apply \
   --kustomize ../argocd/all-argocd-applications \
   --namespace argocd \
   1>"${log_dir}/argocd/log.log" \
   2>"${log_dir}/argocd/err.log"
+echo " Done!"
 
 printf "Waiting for serviceaccount 'admin' in namespace 'kubernetes-dashboard' to exist.."
 wait_for 5m \
@@ -188,6 +202,7 @@ wait_for 5m \
     --namespace kubernetes-dashboard \
     1> /dev/null 2> /dev/null"
 echo " Done!"
+
 printf "Adding middleware with bearer token for kubernetes-dashboard..."
 token=$(kubectl \
   --namespace kubernetes-dashboard \
