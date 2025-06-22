@@ -18,7 +18,7 @@ function wait_for() {
 function create_registry() {
   local name="${1}"
   local host_port="${2}"
-  local k3d_version="{3}"
+  local k3d_version="${3}"
   local log_dir="${4}"
   docker run \
     --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
@@ -52,7 +52,7 @@ function create_registry_mirror() {
   local name="${1}"
   local host_port="${2}"
   local registry_to_mirror="${3}"
-  local k3d_version="{4}"
+  local k3d_version="${4}"
   local log_dir="${5}"
   docker run \
     --env REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
